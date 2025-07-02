@@ -1,0 +1,45 @@
+{
+  "name": "mnemo-functions",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "drizzle:push": "drizzle-kit push",
+    "start:functions": "functions-framework --target=app",
+    "dev": "ts-node src/index.ts",
+    "drizzle:generate": "drizzle-kit generate:pg",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "test",
+  "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.7.0",
+    "@google-cloud/functions-framework": "^3.5.1",
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.41.0",
+    "express": "^5.1.0",
+    "postgres": "^3.4.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.14.0",
+    "@types/pg": "^8.11.11",
+    "@types/pg-connection-string": "^2.0.0",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.6",
+    "jest": "^29.7.0",
+    "pg": "^8.14.1",
+    "pg-connection-string": "^2.7.0",
+    "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

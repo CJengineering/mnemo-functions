@@ -1,0 +1,41 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'europe-docker.pkg.dev/cj-tech-381914/eu.gcr.io/mnemo-app', '.']
+
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-docker.pkg.dev/cj-tech-381914/eu.gcr.io/mnemo-app']
+
+  # Step 3: Deploy the image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'deploy'
+      - 'mnemo-app'
+      - '--image'
+      - 'europe-docker.pkg.dev/cj-tech-381914/eu.gcr.io/mnemo-app'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'europe-west1'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=DB_USER=mnemo_user,DB_PASSWORD=simpleTestPassword2025,DB_NAME=mnemo_db,INSTANCE_CONNECTION_NAME=cj-tech-381914:europe-west1:mnemo'
+
+  # Step 4: Allow unauthenticated access to the service (public access)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'services'
+      - 'add-iam-policy-binding'
+      - 'mnemo-app'
+      - '--region=europe-west1'
+      - '--member=allUsers'
+      - '--role=roles/run.invoker'
+
+# Optional: Step 5 (if you'd like to add a timeout or additional settings)
+# You can add other steps like testing or notifications here.
+
+

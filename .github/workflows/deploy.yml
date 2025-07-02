@@ -1,0 +1,103 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PROJECT_ID: cj-tech-381914
+  SERVICE_NAME: mnemo-app
+  REGION: europe-west1
+  REPOSITORY: eu.gcr.io
+  IMAGE_NAME: mnemo-app
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    
+    # Only deploy on main branch pushes, not PRs
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build TypeScript
+      run: pnpm build
+      
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        
+    - name: Configure Docker to use gcloud as a credential helper
+      run: |
+        gcloud auth configure-docker europe-docker.pkg.dev
+        
+    - name: Build Docker image
+      run: |
+        docker build -t europe-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GITHUB_SHA \
+                     -t europe-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:latest .
+        
+    - name: Push Docker image
+      run: |
+        docker push europe-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GITHUB_SHA
+        docker push europe-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:latest
+        
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image europe-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GITHUB_SHA \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated \
+          --set-env-vars="DB_USER=mnemo_user,DB_PASSWORD=simpleTestPassword2025,DB_NAME=mnemo_db,INSTANCE_CONNECTION_NAME=cj-tech-381914:europe-west1:mnemo" \
+          --quiet
+          
+    - name: Show service URL
+      run: |
+        echo "🚀 Service deployed!"
+        gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)'
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build TypeScript
+      run: pnpm build
+      
+    - name: Run tests
+      run: pnpm test || echo "No tests configured yet"

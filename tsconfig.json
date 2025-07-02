@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+ 
+    "types": ["jest", "node"],
+"moduleResolution": "node",
+"resolveJsonModule": true,
+"skipLibCheck": true
+  },
+  "include": [
+    "src/**/*",         // Include all source files, including `lib`
+    "lib/**/*" ,
+    "index.ts"         // Ensure the `lib` directory is included as well
+  ]
+}
