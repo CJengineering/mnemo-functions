@@ -10,6 +10,10 @@ COPY package.json ./
 # Install dependencies using npm
 RUN npm install --only=production
 
+# Install TypeScript and required type definitions for build
+RUN npm install -g typescript
+RUN npm install --save-dev @types/express @types/uuid @types/dotenv
+
 # Copy the source files
 COPY index.ts ./
 COPY src/ ./src/
@@ -18,8 +22,7 @@ COPY schema/ ./schema/
 COPY type.ts ./
 COPY tsconfig.json ./
 
-# Install TypeScript globally and build
-RUN npm install -g typescript
+# Build TypeScript code
 RUN npx tsc
 
 # Expose the port that the app will run on
