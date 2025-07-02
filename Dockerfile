@@ -7,12 +7,11 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 
-# Install dependencies using npm
-RUN npm install --only=production
+# Install all dependencies including dev dependencies for build
+RUN npm install
 
-# Install TypeScript and required type definitions for build
+# Install TypeScript globally for build
 RUN npm install -g typescript
-RUN npm install --save-dev @types/express @types/uuid @types/dotenv
 
 # Copy the source files
 COPY index.ts ./
