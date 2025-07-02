@@ -4,23 +4,26 @@ FROM node:20
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pnpm files (pnpm-lock.yaml and package.json)
-COPY package.json pnpm-lock.yaml ./
+# Copy package files
+COPY package.json ./
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Install dependencies using npm
+RUN npm install --only=production
 
-# Install project dependencies using pnpm
-RUN pnpm install
+# Copy the source files
+COPY index.ts ./
+COPY src/ ./src/
+COPY lib/ ./lib/
+COPY schema/ ./schema/
+COPY type.ts ./
+COPY tsconfig.json ./
 
-# Copy the rest of the application files
-COPY . .
-
-# Build the TypeScript application
-RUN pnpm build
+# Install TypeScript globally and build
+RUN npm install -g typescript
+RUN npx tsc
 
 # Expose the port that the app will run on
 EXPOSE 8080
 
 # Command to run the application
-CMD ["pnpm", "start"]  # Runs your start command from package.json
+CMD ["node", "dist/index.js"]
