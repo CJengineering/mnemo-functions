@@ -8,3 +8,4 @@ export function mapData(input: any): DroppedItem[] {
   }
   return result.data;
 }
+//rrrr
