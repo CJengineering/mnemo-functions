@@ -38,7 +38,6 @@ steps:
 # Configure logging and build options
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: E2_STANDARD_4
 
 # Build timeout (default is 10 minutes)
 timeout: 1200s
