@@ -35,6 +35,14 @@ steps:
       - '--member=allUsers'
       - '--role=roles/run.invoker'
 
+# Configure logging and build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_STANDARD_4
+
+# Build timeout (default is 10 minutes)
+timeout: 1200s
+
 # Optional: Step 5 (if you'd like to add a timeout or additional settings)
 # You can add other steps like testing or notifications here.
 

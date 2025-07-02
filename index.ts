@@ -67,9 +67,10 @@ app.get("/collection-items/:id", wrapAsync(getCollectionItemById)); // Get colle
 app.put("/collection-items/:id", wrapAsync(updateCollectionItem)); // Update collection item
 app.delete("/collection-items/:id", wrapAsync(deleteCollectionItem)); // Delete collection item
 app.get("/collection-items/type/:type", wrapAsync(getCollectionItemsByType)); // Get collection items by type
-// 5. Start listening on port 8080 (for Cloud Run)
-app.listen(8080, () => {
-  console.log("Server is running on port 8080");
+// 5. Start listening on the port provided by Cloud Run (or default to 8080)
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
 
 // 6. Export the app for Cloud Functions or Cloud Run

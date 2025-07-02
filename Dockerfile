@@ -16,6 +16,9 @@ RUN pnpm install
 # Copy the rest of the application files
 COPY . .
 
+# Build the TypeScript application
+RUN pnpm build
+
 # Expose the port that the app will run on
 EXPOSE 8080
 
