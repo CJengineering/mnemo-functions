@@ -13,6 +13,11 @@ build/
 .env.test.local
 .env.production.local
 
+# Google Cloud credentials
+key.json
+*.json
+service-account-*.json
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
