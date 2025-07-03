@@ -1,14 +1,5 @@
-node_modules
-npm-debug.log
-.git
-.gitignore
-README.md
-.env
-.nyc_output
-coverage
-.DS_Store
-.github
-.vscode
-.idea
-.log
-pnpm-lock.yaml
+node_modules;
+npm - debug.log.git.gitignore;
+README.md.env.nyc_output;
+coverage.DS_Store.github.vscode.idea.log;
+pnpm - lock.yaml;

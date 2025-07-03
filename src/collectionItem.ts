@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import { pool } from "../schema/db";
+import {
+  mapIncomingCollectionItem,
+  collectionItemToDbFormat,
+  IncomingCollectionItem,
+} from "./mappers";
 
 // CREATE Collection Item
 export async function createCollectionItem(req: Request, res: Response) {
@@ -17,12 +22,10 @@ export async function createCollectionItem(req: Request, res: Response) {
 
     if (!title || !type) {
       console.log("⚠️ Missing required fields");
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Missing required fields: title and type are required",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: title and type are required",
+      });
     }
 
     // Validate enum values
@@ -41,21 +44,17 @@ export async function createCollectionItem(req: Request, res: Response) {
     const validStatuses = ["active", "inactive", "archived"];
 
     if (!validTypes.includes(type)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
+      });
     }
 
     if (status && !validStatuses.includes(status)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      });
     }
 
     const parsedData = JSON.stringify(data || {});
@@ -179,21 +178,17 @@ export async function updateCollectionItem(req: Request, res: Response) {
     const validStatuses = ["active", "inactive", "archived"];
 
     if (type && !validTypes.includes(type)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
+      });
     }
 
     if (status && !validStatuses.includes(status)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      });
     }
 
     // Build dynamic update query
@@ -320,12 +315,10 @@ export async function getCollectionItemsByType(req: Request, res: Response) {
     ];
 
     if (!validTypes.includes(type)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
-        });
+      return res.status(400).json({
+        success: false,
+        error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
+      });
     }
 
     const result = await pool.query(
@@ -340,6 +333,81 @@ export async function getCollectionItemsByType(req: Request, res: Response) {
       error instanceof Error
         ? error.message
         : "Failed to fetch collection items by type";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+// CREATE Collection Item using Mapper (NEW - Frontend Form)
+export async function createCollectionItemFromForm(
+  req: Request,
+  res: Response
+) {
+  try {
+    const incomingData: IncomingCollectionItem = req.body;
+
+    console.log("📥 Received form data:", {
+      type: incomingData.type,
+      title: (incomingData.data as any).title,
+      slug: (incomingData.data as any).slug,
+    });
+
+    // Validate required fields based on type
+    if (!incomingData.type || !incomingData.data) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: type and data are required",
+      });
+    }
+
+    // Validate that title and slug are provided in data
+    const data = incomingData.data as any;
+    if (!data.title || !data.slug) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields in data: title and slug are required",
+      });
+    }
+
+    // Map incoming data to collection item format
+    const mappedItem = mapIncomingCollectionItem(incomingData);
+
+    // Convert to database format
+    const dbFormat = collectionItemToDbFormat(mappedItem);
+
+    console.log("🔄 Mapped to database format:", {
+      title: dbFormat.title,
+      type: dbFormat.type,
+      status: dbFormat.status,
+    });
+
+    // Insert into PostgreSQL
+    const result = await pool.query(
+      `INSERT INTO collection_item (title, description, type, data, meta_data, status) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [
+        dbFormat.title,
+        dbFormat.description,
+        dbFormat.type,
+        dbFormat.data,
+        dbFormat.metaData,
+        dbFormat.status,
+      ]
+    );
+
+    const collectionItem = result.rows[0];
+
+    console.log("✅ Created collection item with mapper:", collectionItem.id);
+    res.status(201).json({
+      success: true,
+      collectionItem,
+      mappedData: mappedItem, // Include the mapped format for debugging
+    });
+  } catch (error) {
+    console.error("❌ createCollectionItemFromForm error:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to create collection item from form";
     res.status(500).json({ success: false, error: errorMessage });
   }
 }

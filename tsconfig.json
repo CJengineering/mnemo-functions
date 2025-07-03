@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",
-    "types": ["node"],
+    "types": ["node", "jest"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -20,8 +20,6 @@
     "index.ts"
   ],
   "exclude": [
-    "**/*.test.ts",
-    "**/*.spec.ts",
     "node_modules",
     "dist"
   ]
