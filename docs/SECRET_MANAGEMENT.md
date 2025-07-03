@@ -28,6 +28,7 @@ gcloud secrets add-iam-policy-binding openai-api-key \
 ### 3. Update Cloud Run Configuration
 
 The `cloudbuild.yaml` already includes the secret configuration:
+
 ```yaml
 --set-secrets=OPENAI_API_KEY=openai-api-key:latest
 ```
@@ -54,6 +55,7 @@ nano .env
 ## Security Best Practices
 
 ### ✅ DO:
+
 - Store secrets in Google Cloud Secret Manager for production
 - Use `.env.template` for documentation
 - Keep `.env` in `.gitignore`
@@ -61,6 +63,7 @@ nano .env
 - Use least-privilege access for service accounts
 
 ### ❌ DON'T:
+
 - Commit API keys to Git
 - Share API keys in plain text
 - Use the same key for multiple environments
@@ -69,12 +72,14 @@ nano .env
 ## Managing Secrets
 
 ### Update a Secret
+
 ```bash
 # Update existing secret
 echo "new_api_key_here" | gcloud secrets versions add openai-api-key --data-file=-
 ```
 
 ### View Secret Versions
+
 ```bash
 # List all versions
 gcloud secrets versions list openai-api-key
@@ -84,6 +89,7 @@ gcloud secrets versions access latest --secret="openai-api-key"
 ```
 
 ### Delete a Secret
+
 ```bash
 # Delete the secret (use with caution!)
 gcloud secrets delete openai-api-key
@@ -92,11 +98,13 @@ gcloud secrets delete openai-api-key
 ## Troubleshooting
 
 ### Cloud Run Can't Access Secret
+
 1. Check service account permissions
 2. Verify secret exists: `gcloud secrets list`
 3. Check Cloud Run logs: `gcloud logging read "resource.type=cloud_run_revision"`
 
 ### Local Development Issues
+
 1. Verify `.env` file exists and has correct key
 2. Check key format (should start with `sk-proj-`)
 3. Test key with OpenAI API directly
@@ -104,12 +112,14 @@ gcloud secrets delete openai-api-key
 ## Environment Variables in Cloud Run
 
 ### Current Configuration:
+
 - `DB_USER`, `DB_PASSWORD`, `DB_NAME`: Database credentials
 - `INSTANCE_CONNECTION_NAME`: Cloud SQL connection
 - `OPENAI_API_KEY`: Loaded from Secret Manager
 - `NODE_ENV`: Set to `production` automatically
 
 ### View Current Environment:
+
 ```bash
 gcloud run services describe mnemo-app --region=europe-west1 --format="value(spec.template.spec.template.spec.containers[0].env[].name,spec.template.spec.template.spec.containers[0].env[].value)"
 ```
