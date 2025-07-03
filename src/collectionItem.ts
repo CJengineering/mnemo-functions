@@ -348,15 +348,15 @@ export async function createCollectionItemFromForm(
   res: Response
 ) {
   try {
-    const incomingData: IncomingCollectionItem = req.body;
+    const incomingData = req.body as IncomingCollectionItem;
 
     console.log("📥 Received form data:", {
       type: incomingData.type,
-      title: (incomingData.data as any).title,
-      slug: (incomingData.data as any).slug,
+      title: incomingData.data?.title,
+      slug: incomingData.data?.slug,
     });
 
-    // Validate required fields based on type
+    // Validate the incoming data structure
     if (!incomingData.type || !incomingData.data) {
       return res.status(400).json({
         success: false,
@@ -364,28 +364,28 @@ export async function createCollectionItemFromForm(
       });
     }
 
-    // Validate that title and slug are provided in data
-    const data = incomingData.data as any;
-    if (!data.title || !data.slug) {
+    // Basic validation for required fields in data
+    if (!incomingData.data.title || !incomingData.data.slug) {
       return res.status(400).json({
         success: false,
         error: "Missing required fields in data: title and slug are required",
       });
     }
 
-    // Map incoming data to collection item format
-    const mappedItem = mapIncomingCollectionItem(incomingData);
+    console.log("🔄 Mapping data using collection item mapper...");
 
-    // Convert to database format
+    // Use the mapper to transform and validate the data
+    const mappedItem = mapIncomingCollectionItem(incomingData);
     const dbFormat = collectionItemToDbFormat(mappedItem);
 
-    console.log("🔄 Mapped to database format:", {
+    console.log("✅ Data mapped successfully:", {
       title: dbFormat.title,
       type: dbFormat.type,
       status: dbFormat.status,
+      dataKeys: Object.keys(dbFormat.data),
     });
 
-    // Insert into PostgreSQL
+    // Insert the properly mapped data into the database
     const result = await pool.query(
       `INSERT INTO collection_item (slug, title, type, data, status) 
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
@@ -400,11 +400,10 @@ export async function createCollectionItemFromForm(
 
     const collectionItem = result.rows[0];
 
-    console.log("✅ Created collection item with mapper:", collectionItem.id);
+    console.log("✅ Created collection item:", collectionItem.id);
     res.status(201).json({
       success: true,
       collectionItem,
-      mappedData: mappedItem, // Include the mapped format for debugging
     });
   } catch (error) {
     console.error("❌ createCollectionItemFromForm error:", error);

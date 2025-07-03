@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "drizzle:push": "drizzle-kit push",
     "start:functions": "functions-framework --target=app",
-    "dev": "ts-node src/index.ts",
+    "dev": "ts-node index.ts",
     "drizzle:generate": "drizzle-kit generate:pg",
     "test": "jest"
   },
