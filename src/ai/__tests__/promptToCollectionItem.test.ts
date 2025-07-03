@@ -113,9 +113,9 @@ describe("AI Prompt to Collection Item", () => {
       if (result.success) {
         expect(result.data.type).toBe("event");
         expect(result.data.data.title).toBe("AI Innovation Summit 2025");
-        expect(result.data.data.city).toBe("Dubai");
-        expect(result.data.data.eventDate).toBe("2025-08-15");
-        expect(result.data.data.featured).toBe(true);
+        expect((result.data.data as any).city).toBe("Dubai");
+        expect((result.data.data as any).eventDate).toBe("2025-08-15");
+        expect((result.data.data as any).featured).toBe(true);
       }
 
       expect(mockCreate).toHaveBeenCalledWith({

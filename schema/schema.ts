@@ -9,6 +9,7 @@ import {
   uuid,
   jsonb,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 
 // Enums
@@ -17,6 +18,10 @@ export const contentStatusEnum = pgEnum("content_status", [
   "draft",
   "published",
   "archived",
+]);
+export const collectionItemStatusEnum = pgEnum("collection_item_status", [
+  "draft",
+  "published",
 ]);
 export const collectionItemTypeEnum = pgEnum("collection_item_type", [
   "event",
@@ -132,14 +137,23 @@ export const programmeDataChunk = pgTable(
   })
 );
 
-export const collectionItem = pgTable("collection_item", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description"),
-  type: collectionItemTypeEnum("type").notNull(),
-  data: jsonb("data").notNull().default({}),
-  metaData: jsonb("meta_data").notNull().default({}),
-  status: statusEnum("status").notNull().default("active"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+export const collectionItem = pgTable(
+  "collection_item",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    type: collectionItemTypeEnum("type").notNull(),
+    status: collectionItemStatusEnum("status").notNull().default("draft"),
+    data: jsonb("data").notNull().default({}),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    // Indexes for fast lookup
+    slugIdx: index("collection_item_slug_idx").on(table.slug),
+    titleIdx: index("collection_item_title_idx").on(table.title),
+    typeIdx: index("collection_item_type_idx").on(table.type),
+    statusIdx: index("collection_item_status_idx").on(table.status),
+  })
+);

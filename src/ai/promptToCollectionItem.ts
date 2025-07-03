@@ -2,10 +2,12 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { IncomingCollectionItem, IncomingCollectionItemData } from "../mappers";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client with null safety for testing
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  : null;
 
 // Zod schemas for validation
 const AISuccessResponseSchema = z.object({
@@ -296,15 +298,14 @@ export async function promptToCollectionItem(
       });
 
       const result = await pool.query(
-        `INSERT INTO collection_item (title, description, type, data, meta_data, status) 
-         VALUES ($1, $2, $3, $4, $5, $6) 
+        `INSERT INTO collection_item (slug, title, type, data, status) 
+         VALUES ($1, $2, $3, $4, $5) 
          RETURNING *`,
         [
+          dbFormat.slug,
           dbFormat.title,
-          dbFormat.description,
           dbFormat.type,
-          dbFormat.data,
-          dbFormat.metaData,
+          JSON.stringify(dbFormat.data),
           dbFormat.status,
         ]
       );

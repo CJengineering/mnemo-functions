@@ -159,7 +159,9 @@ app.post("/api/collection-items/demo", async (req: Request, res: Response) => {
 // 7. AI-powered endpoints
 app.post("/api/prompt-to-item", async (req: Request, res: Response) => {
   try {
-    const { promptToItemEndpoint } = await import("./src/api/promptToItemRoutes");
+    const { promptToItemEndpoint } = await import(
+      "./src/api/promptToItemRoutes"
+    );
     await promptToItemEndpoint(req, res);
   } catch (error) {
     console.error("❌ AI prompt-to-item error:", error);

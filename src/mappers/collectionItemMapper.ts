@@ -258,19 +258,9 @@ export function mapIncomingCollectionItem(
 export function collectionItemToDbFormat(item: any) {
   return {
     title: item.title,
-    description:
-      item.data.description ||
-      item.data.summary ||
-      item.data.shortDescription ||
-      null,
+    slug: item.slug,
     type: item.type,
-    data: JSON.stringify(item.data),
-    metaData: JSON.stringify({
-      slug: item.slug,
-      status: item.status,
-      created_at: item.created_at,
-      updated_at: item.updated_at,
-    }),
-    status: item.status === "published" ? "active" : "inactive", // Map interface status to DB status
+    status: item.status, // Direct mapping: "draft" | "published"
+    data: item.data, // Pass object directly, Drizzle will handle JSON serialization
   };
 }

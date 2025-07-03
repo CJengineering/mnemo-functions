@@ -258,10 +258,10 @@ function completeWorkflowExample() {
   // This is what you would insert into your database
   console.log("4. Ready for database insertion:", {
     title: dbFormat.title,
+    slug: dbFormat.slug,
     type: dbFormat.type,
     status: dbFormat.status,
-    dataSize: dbFormat.data.length + " characters",
-    metaDataSize: dbFormat.metaData.length + " characters",
+    dataSize: JSON.stringify(dbFormat.data).length + " characters",
   });
 
   return dbFormat;

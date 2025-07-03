@@ -58,13 +58,18 @@ export async function createCollectionItem(req: Request, res: Response) {
     }
 
     const parsedData = JSON.stringify(data || {});
-    const parsedMetaData = JSON.stringify(metaData || {});
+
+    // Generate slug from title if not provided
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
     // Insert new collection item into PostgreSQL
     const result = await pool.query(
-      `INSERT INTO collection_item (title, description, type, data, meta_data, status) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [title, description, type, parsedData, parsedMetaData, status || "active"]
+      `INSERT INTO collection_item (slug, title, type, data, status) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [slug, title, type, parsedData, status || "draft"]
     );
 
     const collectionItem = result.rows[0];
@@ -382,14 +387,13 @@ export async function createCollectionItemFromForm(
 
     // Insert into PostgreSQL
     const result = await pool.query(
-      `INSERT INTO collection_item (title, description, type, data, meta_data, status) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      `INSERT INTO collection_item (slug, title, type, data, status) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [
+        dbFormat.slug,
         dbFormat.title,
-        dbFormat.description,
         dbFormat.type,
-        dbFormat.data,
-        dbFormat.metaData,
+        JSON.stringify(dbFormat.data),
         dbFormat.status,
       ]
     );

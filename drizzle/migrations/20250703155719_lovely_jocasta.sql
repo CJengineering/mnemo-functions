@@ -1,0 +1,1 @@
+ALTER TABLE "collection_item" ADD CONSTRAINT "collection_item_slug_unique" UNIQUE("slug");

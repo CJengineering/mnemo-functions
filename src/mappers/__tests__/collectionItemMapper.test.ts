@@ -324,45 +324,27 @@ describe("Collection Item Mappers", () => {
 
       expect(dbFormat).toEqual({
         title: "Test Event",
-        description: null,
+        slug: "test-event",
         type: "event",
-        data: JSON.stringify({
+        status: "published", // Direct mapping
+        data: {
           featured: true,
           eventDate: "2025-08-01",
-        }),
-        metaData: JSON.stringify({
-          slug: "test-event",
-          status: "published",
-          created_at: mockDate,
-          updated_at: mockDate,
-        }),
-        status: "active", // published maps to active
+        },
       });
     });
 
-    it("should map draft status to inactive", () => {
+    it("should map draft status correctly", () => {
       const mappedItem = {
         type: "event",
         status: "draft",
         title: "Draft Event",
+        slug: "draft-event",
         data: {},
       };
 
       const dbFormat = collectionItemToDbFormat(mappedItem);
-      expect(dbFormat.status).toBe("inactive");
-    });
-
-    it("should handle description fallbacks", () => {
-      const mappedItem = {
-        type: "news",
-        title: "News Item",
-        data: {
-          summary: "News summary",
-        },
-      };
-
-      const dbFormat = collectionItemToDbFormat(mappedItem);
-      expect(dbFormat.description).toBe("News summary");
+      expect(dbFormat.status).toBe("draft");
     });
   });
 });
@@ -395,15 +377,10 @@ describe("Integration Test", () => {
     // Verify the complete transformation
     expect(dbFormat.title).toBe("Complete Integration Event");
     expect(dbFormat.type).toBe("event");
-    expect(dbFormat.status).toBe("active");
+    expect(dbFormat.status).toBe("published");
 
-    const parsedData = JSON.parse(dbFormat.data);
-    expect(parsedData.eventDate).toBe("2025-12-01");
-    expect(parsedData.city).toBe("Dubai");
-    expect(parsedData.featured).toBe(true);
-
-    const parsedMetaData = JSON.parse(dbFormat.metaData);
-    expect(parsedMetaData.slug).toBe("integration-event");
-    expect(parsedMetaData.status).toBe("published");
+    expect(dbFormat.data.eventDate).toBe("2025-12-01");
+    expect(dbFormat.data.city).toBe("Dubai");
+    expect(dbFormat.data.featured).toBe(true);
   });
 });
