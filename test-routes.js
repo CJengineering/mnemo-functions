@@ -30,15 +30,18 @@ console.log(JSON.stringify(testEventData, null, 2));
 async function testDemoRoute() {
   console.log("\n🔍 Testing Demo Route (/api/collection-items/demo)");
   console.log("This route transforms data but doesn't save to database\n");
-  
+
   try {
-    const response = await fetch("http://localhost:8080/api/collection-items/demo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(testEventData),
-    });
+    const response = await fetch(
+      "http://localhost:8080/api/collection-items/demo",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(testEventData),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -51,7 +54,7 @@ async function testDemoRoute() {
     console.log(`   - Title: ${result.databaseFormat?.title}`);
     console.log(`   - Type: ${result.databaseFormat?.type}`);
     console.log(`   - Status: ${result.databaseFormat?.status}`);
-    
+
     return result;
   } catch (error) {
     console.error("❌ Demo Route Failed:", error.message);
@@ -62,7 +65,7 @@ async function testDemoRoute() {
 async function testProductionRoute() {
   console.log("\n🔍 Testing Production Route (/api/collection-items)");
   console.log("This route transforms data AND saves to database\n");
-  
+
   try {
     const response = await fetch("http://localhost:8080/api/collection-items", {
       method: "POST",
@@ -83,7 +86,7 @@ async function testProductionRoute() {
     console.log(`   - Title: ${result.collectionItem?.title}`);
     console.log(`   - Type: ${result.collectionItem?.type}`);
     console.log(`   - Status: ${result.collectionItem?.status}`);
-    
+
     return result;
   } catch (error) {
     console.error("❌ Production Route Failed:", error.message);
@@ -93,17 +96,17 @@ async function testProductionRoute() {
 
 async function runTests() {
   console.log("🚀 Starting Route Integration Tests...\n");
-  
+
   // Test demo route
   const demoResult = await testDemoRoute();
-  
+
   // Test production route
   const productionResult = await testProductionRoute();
-  
+
   console.log("\n" + "=".repeat(50));
   console.log("📊 Test Summary");
   console.log("=".repeat(50));
-  
+
   if (demoResult && productionResult) {
     console.log("✅ All tests passed!");
     console.log("✅ Demo route: Data transformation working");
