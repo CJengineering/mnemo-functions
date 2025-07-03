@@ -15,6 +15,7 @@ RUN npm install -g typescript
 
 # Copy the source files
 COPY index.ts ./
+COPY interface.ts ./
 COPY src/ ./src/
 COPY lib/ ./lib/
 COPY schema/ ./schema/
