@@ -19,11 +19,13 @@ User Prompt → AI Processing → Structured Data → Database Save
 ## 📡 API Endpoints
 
 ### Production Endpoint
+
 ```
 POST /api/prompt-to-item
 ```
 
 **Request Body:**
+
 ```json
 {
   "prompt": "Create a Climate Innovation Summit happening on September 15, 2025 in Dubai. It should be featured and run for 2 days.",
@@ -33,6 +35,7 @@ POST /api/prompt-to-item
 ```
 
 **Success Response:**
+
 ```json
 {
   "success": true,
@@ -52,6 +55,7 @@ POST /api/prompt-to-item
 ```
 
 **Error Response:**
+
 ```json
 {
   "success": false,
@@ -69,36 +73,44 @@ POST /api/prompt-to-item
 ```
 
 ### Demo Endpoint
+
 ```
 POST /api/prompt-to-item/demo
 ```
+
 Same format as production but doesn't save to database.
 
 ## 🎯 Supported Collection Types
 
 ### Events
+
 **Keywords**: event, conference, workshop, meeting, summit
 **Required Fields**: title, slug, eventDate, city, status
 
-### Posts  
+### Posts
+
 **Keywords**: blog, post, article, write
 **Required Fields**: title, slug, datePublished, status
 
 ### News
+
 **Keywords**: news, announcement, press, breaking
 **Required Fields**: title, slug, datePublished, status
 
 ### Programmes
+
 **Keywords**: programme, program, initiative, project
 **Required Fields**: title, slug, status
 
 ### Sources
+
 **Keywords**: source, publication, journal, magazine
 **Required Fields**: title, slug, status
 
 ## 💬 Example Prompts
 
 ### Event Examples
+
 ```
 "Create a Climate Innovation Summit happening on September 15, 2025 in Dubai"
 "Schedule a workshop on AI applications for healthcare next month in Abu Dhabi"
@@ -106,6 +118,7 @@ Same format as production but doesn't save to database.
 ```
 
 ### Blog Post Examples
+
 ```
 "Write a blog post about sustainable energy innovations, publish it on August 1st"
 "Create a technical article on machine learning in healthcare"
@@ -113,6 +126,7 @@ Same format as production but doesn't save to database.
 ```
 
 ### News Examples
+
 ```
 "Breaking news: MIT researchers achieve 40% improvement in solar panel efficiency"
 "Create a news article about the new research collaboration announced today"
@@ -122,12 +136,15 @@ Same format as production but doesn't save to database.
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ### System Prompts
+
 Each collection type has a specific system prompt that:
+
 - Defines required and optional fields
 - Provides formatting guidelines
 - Explains response structure
@@ -138,11 +155,13 @@ Each collection type has a specific system prompt that:
 ### Common Scenarios
 
 1. **Missing Required Fields**
+
    - AI identifies what's missing
    - Provides specific suggestions
    - Returns partial data if available
 
 2. **Invalid Prompts**
+
    - Too short prompts (< 10 characters)
    - Unclear descriptions
    - Conflicting information
@@ -153,6 +172,7 @@ Each collection type has a specific system prompt that:
    - Network issues
 
 ### Response Codes
+
 - `201` - Success (item created)
 - `400` - Missing fields or invalid input
 - `500` - Server/API errors
@@ -160,16 +180,19 @@ Each collection type has a specific system prompt that:
 ## 🧪 Testing
 
 ### Core Functionality Test
+
 ```bash
 node test-ai-core.js
 ```
 
-### Integration Tests  
+### Integration Tests
+
 ```bash
 node test-ai-prompts.js
 ```
 
 ### Manual Testing
+
 ```bash
 curl -X POST http://localhost:8080/api/prompt-to-item/demo \
   -H "Content-Type: application/json" \
@@ -195,9 +218,14 @@ Prompt → AI → IncomingCollectionItem → Mapper → Database Format → Post
 ## 🎨 Frontend Integration
 
 ### Simple Form
+
 ```html
 <form id="aiForm">
-  <textarea name="prompt" placeholder="Describe what you want to create..." required></textarea>
+  <textarea
+    name="prompt"
+    placeholder="Describe what you want to create..."
+    required
+  ></textarea>
   <select name="type">
     <option value="">Auto-detect</option>
     <option value="event">Event</option>
@@ -209,39 +237,40 @@ Prompt → AI → IncomingCollectionItem → Mapper → Database Format → Post
 </form>
 
 <script>
-document.getElementById('aiForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  
-  const response = await fetch('/api/prompt-to-item', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: formData.get('prompt'),
-      type: formData.get('type') || undefined
-    })
-  });
-  
-  const result = await response.json();
-  
-  if (result.success) {
-    console.log('Created:', result.id);
-  } else {
-    console.log('Missing:', result.missing);
-    console.log('Suggestions:', result.suggestions);
-  }
-};
+  document.getElementById("aiForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    const response = await fetch("/api/prompt-to-item", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: formData.get("prompt"),
+        type: formData.get("type") || undefined,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log("Created:", result.id);
+    } else {
+      console.log("Missing:", result.missing);
+      console.log("Suggestions:", result.suggestions);
+    }
+  };
 </script>
 ```
 
 ### Advanced with Error Handling
+
 ```javascript
 async function createWithAI(prompt, type, context) {
   try {
-    const response = await fetch('/api/prompt-to-item', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, type, context })
+    const response = await fetch("/api/prompt-to-item", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, type, context }),
     });
 
     const result = await response.json();
@@ -254,7 +283,7 @@ async function createWithAI(prompt, type, context) {
         success: false,
         missing: result.missing,
         suggestions: result.suggestions,
-        partialData: result.partialData
+        partialData: result.partialData,
       };
     }
   } catch (error) {

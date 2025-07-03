@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
-import { z } from 'zod';
-import { IncomingCollectionItem, IncomingCollectionItemData } from '../mappers';
+import OpenAI from "openai";
+import { z } from "zod";
+import { IncomingCollectionItem, IncomingCollectionItemData } from "../mappers";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -9,21 +9,24 @@ const openai = new OpenAI({
 
 // Zod schemas for validation
 const AISuccessResponseSchema = z.object({
-  status: z.literal('ok'),
+  status: z.literal("ok"),
   data: z.object({
-    type: z.enum(['event', 'post', 'programme', 'news', 'source']),
+    type: z.enum(["event", "post", "programme", "news", "source"]),
     data: z.record(z.any()), // Will be validated more specifically later
-  })
+  }),
 });
 
 const AIErrorResponseSchema = z.object({
-  status: z.literal('error'),
+  status: z.literal("error"),
   message: z.string(),
   missing: z.array(z.string()),
   partial_data: z.record(z.any()).optional(),
 });
 
-const AIResponseSchema = z.union([AISuccessResponseSchema, AIErrorResponseSchema]);
+const AIResponseSchema = z.union([
+  AISuccessResponseSchema,
+  AIErrorResponseSchema,
+]);
 
 // System prompts for different collection types
 const SYSTEM_PROMPTS = {
@@ -172,12 +175,12 @@ OPTIONAL FIELDS:
 - logo: object with url and alt
 - logoNative: object with url and alt
 
-Follow the same response format as events. Always generate slug from title.`
+Follow the same response format as events. Always generate slug from title.`,
 };
 
 export interface PromptToItemRequest {
   prompt: string;
-  type?: 'event' | 'post' | 'programme' | 'news' | 'source';
+  type?: "event" | "post" | "programme" | "news" | "source";
   context?: string; // Additional context from user
 }
 
@@ -196,91 +199,102 @@ export interface PromptToItemErrorResponse {
   suggestions?: string[];
 }
 
-export type PromptToItemResponse = PromptToItemSuccessResponse | PromptToItemErrorResponse;
+export type PromptToItemResponse =
+  | PromptToItemSuccessResponse
+  | PromptToItemErrorResponse;
 
 export async function promptToCollectionItem(
   request: PromptToItemRequest,
   saveToDatabase: boolean = false
 ): Promise<PromptToItemResponse> {
   try {
-    console.log('🤖 Processing prompt:', request.prompt);
-    
+    console.log("🤖 Processing prompt:", request.prompt);
+
     // Check if OpenAI API key is available
     if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OpenAI API key is not configured');
+      throw new Error("OpenAI API key is not configured");
     }
-    
+
     // Determine collection type (either specified or inferred)
-    const collectionType = request.type || await inferCollectionType(request.prompt);
-    
+    const collectionType =
+      request.type || (await inferCollectionType(request.prompt));
+
     // Get appropriate system prompt
     const systemPrompt = SYSTEM_PROMPTS[collectionType] || SYSTEM_PROMPTS.event;
-    
+
     console.log(`🤖 Using collection type: ${collectionType}`);
-    
+
     // Call ChatGPT
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: "system", content: systemPrompt },
-        { 
-          role: "user", 
-          content: `Convert this description into structured data: "${request.prompt}"${request.context ? `\n\nAdditional context: ${request.context}` : ''}` 
-        }
+        {
+          role: "user",
+          content: `Convert this description into structured data: "${
+            request.prompt
+          }"${
+            request.context ? `\n\nAdditional context: ${request.context}` : ""
+          }`,
+        },
       ],
       temperature: 0.1, // Low temperature for consistent structured output
     });
 
     const aiResponseText = completion.choices[0]?.message?.content;
-    
+
     if (!aiResponseText) {
-      throw new Error('No response from AI');
+      throw new Error("No response from AI");
     }
 
-    console.log('🤖 AI Response:', aiResponseText);
+    console.log("🤖 AI Response:", aiResponseText);
 
     // Parse AI response
     let aiResponse;
     try {
       aiResponse = JSON.parse(aiResponseText);
     } catch (parseError) {
-      throw new Error('AI returned invalid JSON: ' + aiResponseText);
+      throw new Error("AI returned invalid JSON: " + aiResponseText);
     }
 
     // Validate AI response structure
     const validatedResponse = AIResponseSchema.parse(aiResponse);
 
-    if (validatedResponse.status === 'error') {
+    if (validatedResponse.status === "error") {
       return {
         success: false,
         message: validatedResponse.message,
         missing: validatedResponse.missing,
         partialData: validatedResponse.partial_data,
-        suggestions: generateSuggestions(validatedResponse.missing, collectionType)
+        suggestions: generateSuggestions(
+          validatedResponse.missing,
+          collectionType
+        ),
       };
     }
 
     // Success case - we have all required fields
     const collectionItemData: IncomingCollectionItem = {
       type: validatedResponse.data.type,
-      data: validatedResponse.data.data as IncomingCollectionItemData
+      data: validatedResponse.data.data as IncomingCollectionItemData,
     };
-    
+
     if (saveToDatabase) {
       // Import mapper and database functions
-      const { mapIncomingCollectionItem, collectionItemToDbFormat } = await import('../mappers');
-      const { pool } = await import('../../schema/db');
-      
+      const { mapIncomingCollectionItem, collectionItemToDbFormat } =
+        await import("../mappers");
+      const { pool } = await import("../../schema/db");
+
       // Transform and save to database
       const mappedItem = mapIncomingCollectionItem(collectionItemData);
       const dbFormat = collectionItemToDbFormat(mappedItem);
-      
-      console.log('💾 Saving to database:', {
+
+      console.log("💾 Saving to database:", {
         title: dbFormat.title,
         type: dbFormat.type,
-        status: dbFormat.status
+        status: dbFormat.status,
       });
-      
+
       const result = await pool.query(
         `INSERT INTO collection_item (title, description, type, data, meta_data, status) 
          VALUES ($1, $2, $3, $4, $5, $6) 
@@ -291,17 +305,17 @@ export async function promptToCollectionItem(
           dbFormat.type,
           dbFormat.data,
           dbFormat.metaData,
-          dbFormat.status
+          dbFormat.status,
         ]
       );
-      
-      console.log('✅ Saved to database with ID:', result.rows[0].id);
-      
+
+      console.log("✅ Saved to database with ID:", result.rows[0].id);
+
       return {
         success: true,
         data: collectionItemData,
         aiResponse: validatedResponse,
-        id: result.rows[0].id
+        id: result.rows[0].id,
       };
     }
 
@@ -309,76 +323,114 @@ export async function promptToCollectionItem(
     return {
       success: true,
       data: collectionItemData,
-      aiResponse: validatedResponse
+      aiResponse: validatedResponse,
     };
-
   } catch (error) {
-    console.error('❌ Prompt to Collection Item error:', error);
-    
+    console.error("❌ Prompt to Collection Item error:", error);
+
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to process prompt',
+      message:
+        error instanceof Error ? error.message : "Failed to process prompt",
       missing: [],
-      partialData: undefined
+      partialData: undefined,
     };
   }
 }
 
 // Helper function to infer collection type from prompt
-async function inferCollectionType(prompt: string): Promise<keyof typeof SYSTEM_PROMPTS> {
+async function inferCollectionType(
+  prompt: string
+): Promise<keyof typeof SYSTEM_PROMPTS> {
   const lowerPrompt = prompt.toLowerCase();
-  
-  if (lowerPrompt.includes('event') || lowerPrompt.includes('conference') || lowerPrompt.includes('workshop') || lowerPrompt.includes('meeting') || lowerPrompt.includes('summit')) {
-    return 'event';
+
+  if (
+    lowerPrompt.includes("event") ||
+    lowerPrompt.includes("conference") ||
+    lowerPrompt.includes("workshop") ||
+    lowerPrompt.includes("meeting") ||
+    lowerPrompt.includes("summit")
+  ) {
+    return "event";
   }
-  if (lowerPrompt.includes('blog') || lowerPrompt.includes('post') || lowerPrompt.includes('article') || lowerPrompt.includes('write')) {
-    return 'post';
+  if (
+    lowerPrompt.includes("blog") ||
+    lowerPrompt.includes("post") ||
+    lowerPrompt.includes("article") ||
+    lowerPrompt.includes("write")
+  ) {
+    return "post";
   }
-  if (lowerPrompt.includes('news') || lowerPrompt.includes('announcement') || lowerPrompt.includes('press') || lowerPrompt.includes('breaking')) {
-    return 'news';
+  if (
+    lowerPrompt.includes("news") ||
+    lowerPrompt.includes("announcement") ||
+    lowerPrompt.includes("press") ||
+    lowerPrompt.includes("breaking")
+  ) {
+    return "news";
   }
-  if (lowerPrompt.includes('programme') || lowerPrompt.includes('program') || lowerPrompt.includes('initiative') || lowerPrompt.includes('project')) {
-    return 'programme';
+  if (
+    lowerPrompt.includes("programme") ||
+    lowerPrompt.includes("program") ||
+    lowerPrompt.includes("initiative") ||
+    lowerPrompt.includes("project")
+  ) {
+    return "programme";
   }
-  if (lowerPrompt.includes('source') || lowerPrompt.includes('publication') || lowerPrompt.includes('journal') || lowerPrompt.includes('magazine')) {
-    return 'source';
+  if (
+    lowerPrompt.includes("source") ||
+    lowerPrompt.includes("publication") ||
+    lowerPrompt.includes("journal") ||
+    lowerPrompt.includes("magazine")
+  ) {
+    return "source";
   }
-  
+
   // Default to event if unclear
-  return 'event';
+  return "event";
 }
 
 // Helper function to generate suggestions for missing fields
 function generateSuggestions(missingFields: string[], type: string): string[] {
   const suggestions = [];
-  
+
   for (const field of missingFields) {
     switch (field) {
-      case 'title':
-        suggestions.push(`Please provide a clear title or name for this ${type}`);
+      case "title":
+        suggestions.push(
+          `Please provide a clear title or name for this ${type}`
+        );
         break;
-      case 'slug':
-        suggestions.push('Please provide a URL-friendly identifier (e.g., "my-event-2025")');
+      case "slug":
+        suggestions.push(
+          'Please provide a URL-friendly identifier (e.g., "my-event-2025")'
+        );
         break;
-      case 'eventDate':
-        suggestions.push('Please specify when this event will take place (date)');
+      case "eventDate":
+        suggestions.push(
+          "Please specify when this event will take place (date)"
+        );
         break;
-      case 'city':
-        suggestions.push('Please mention the city or location where this will happen');
+      case "city":
+        suggestions.push(
+          "Please mention the city or location where this will happen"
+        );
         break;
-      case 'datePublished':
-        suggestions.push('Please specify when this should be published (date)');
+      case "datePublished":
+        suggestions.push("Please specify when this should be published (date)");
         break;
-      case 'thumbnail':
-        suggestions.push('Please provide an image URL for the thumbnail');
+      case "thumbnail":
+        suggestions.push("Please provide an image URL for the thumbnail");
         break;
-      case 'status':
-        suggestions.push('Please specify if this should be "published" or "draft"');
+      case "status":
+        suggestions.push(
+          'Please specify if this should be "published" or "draft"'
+        );
         break;
       default:
         suggestions.push(`Please provide information about: ${field}`);
     }
   }
-  
+
   return suggestions;
 }
