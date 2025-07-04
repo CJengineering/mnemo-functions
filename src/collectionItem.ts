@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
 import { pool } from "../schema/db";
+
+// Helper function to validate UUID format
+function isValidUUID(id: string): boolean {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+}
 import {
   mapIncomingCollectionItem,
   collectionItemToDbFormat,
@@ -126,10 +133,10 @@ export async function getCollectionItemById(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
-    if (isNaN(Number(id))) {
+    if (!isValidUUID(id)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid ID format" });
+        .json({ success: false, error: "Invalid UUID format" });
     }
 
     const result = await pool.query(
@@ -161,10 +168,10 @@ export async function updateCollectionItem(req: Request, res: Response) {
     const { id } = req.params;
     const { title, description, type, data, metaData, status } = req.body;
 
-    if (isNaN(Number(id))) {
+    if (!isValidUUID(id)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid ID format" });
+        .json({ success: false, error: "Invalid UUID format" });
     }
 
     // Validate enum values if provided
@@ -269,10 +276,10 @@ export async function deleteCollectionItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
-    if (isNaN(Number(id))) {
+    if (!isValidUUID(id)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid ID format" });
+        .json({ success: false, error: "Invalid UUID format" });
     }
 
     const result = await pool.query(
