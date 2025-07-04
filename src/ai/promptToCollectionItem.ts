@@ -109,7 +109,31 @@ OPTIONAL FIELDS:
 - relatedEvent: object with id and slug
 - programmeLabel: object with id and slug
 
-Follow the same response format as events. Always generate slug from title.`,
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "post",
+    "data": { 
+      "title": "extracted title",
+      "slug": "url-friendly-slug",
+      "status": "published",
+      "datePublished": "YYYY-MM-DD",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for post creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 
   news: `You are an AI assistant that converts natural language descriptions into structured news article data.
 
@@ -133,7 +157,31 @@ OPTIONAL FIELDS:
 - programmeLabel: object with id and slug
 - people: array of objects with id and slug
 
-Follow the same response format as events. Always generate slug from title.`,
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "news",
+    "data": { 
+      "title": "extracted title",
+      "slug": "url-friendly-slug",
+      "status": "published",
+      "datePublished": "YYYY-MM-DD",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for news creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 
   programme: `You are an AI assistant that converts natural language descriptions into structured programme data.
 
@@ -161,7 +209,30 @@ OPTIONAL FIELDS:
 - logoSvgDark: object with url and alt
 - logoSvgLight: object with url and alt
 
-Follow the same response format as events. Always generate slug from title.`,
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "programme",
+    "data": { 
+      "title": "extracted title",
+      "slug": "url-friendly-slug",
+      "status": "published",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for programme creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 
   source: `You are an AI assistant that converts natural language descriptions into structured source data.
 
@@ -177,7 +248,30 @@ OPTIONAL FIELDS:
 - logo: object with url and alt
 - logoNative: object with url and alt
 
-Follow the same response format as events. Always generate slug from title.`,
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "source",
+    "data": { 
+      "title": "extracted title",
+      "slug": "url-friendly-slug",
+      "status": "published",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for source creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 };
 
 export interface PromptToItemRequest {
