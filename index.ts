@@ -159,7 +159,9 @@ app.post("/api/collection-items/demo", async (req: Request, res: Response) => {
 // 7. AI-powered endpoints
 app.post("/api/prompt-to-item", async (req: Request, res: Response) => {
   try {
-    const { promptToItemEndpoint } = await import("./src/api/promptToItemRoutes");
+    const { promptToItemEndpoint } = await import(
+      "./src/api/promptToItemRoutes"
+    );
     await promptToItemEndpoint(req, res);
   } catch (error) {
     console.error("❌ AI prompt-to-item error:", error);
@@ -183,7 +185,202 @@ app.post("/api/prompt-to-item/demo", async (req: Request, res: Response) => {
   }
 });
 
-// 8. Start server
+// 8. Page/Content endpoints
+app.post("/pages", async (req: Request, res: Response) => {
+  try {
+    const { createPage } = await import("./src/pageData");
+    await createPage(req, res);
+  } catch (error) {
+    console.error("❌ Create page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to create page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/pages", async (req: Request, res: Response) => {
+  try {
+    const { getAllPages } = await import("./src/pageData");
+    await getAllPages(req, res);
+  } catch (error) {
+    console.error("❌ Get all pages error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch pages";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { getPageBySlug } = await import("./src/pageData");
+    await getPageBySlug(req, res);
+  } catch (error) {
+    console.error("❌ Get page by slug error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.put("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { updatePage } = await import("./src/pageData");
+    await updatePage(req, res);
+  } catch (error) {
+    console.error("❌ Update page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.delete("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { deletePage } = await import("./src/pageData");
+    await deletePage(req, res);
+  } catch (error) {
+    console.error("❌ Delete page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to delete page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/programmes", async (req: Request, res: Response) => {
+  try {
+    const { getAllProgrammes } = await import("./src/pageData");
+    await getAllProgrammes(req, res);
+  } catch (error) {
+    console.error("❌ Get all programmes error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch programmes";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+// 9. Data Chunks endpoints
+app.post("/data-chunks", async (req: Request, res: Response) => {
+  try {
+    const { createDataChunk } = await import("./src/dataChunk");
+    await createDataChunk(req, res);
+  } catch (error) {
+    console.error("❌ Create data chunk error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to create data chunk";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/data-chunks", async (req: Request, res: Response) => {
+  try {
+    const { getAllDataChunks } = await import("./src/dataChunk");
+    await getAllDataChunks(req, res);
+  } catch (error) {
+    console.error("❌ Get all data chunks error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch data chunks";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/data-chunks/:id", async (req: Request, res: Response) => {
+  try {
+    const { getDataChunkById } = await import("./src/dataChunk");
+    await getDataChunkById(req, res);
+  } catch (error) {
+    console.error("❌ Get data chunk by ID error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch data chunk";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.put("/data-chunks/:id", async (req: Request, res: Response) => {
+  try {
+    const { updateDataChunk } = await import("./src/dataChunk");
+    await updateDataChunk(req, res);
+  } catch (error) {
+    console.error("❌ Update data chunk error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update data chunk";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.delete("/data-chunks/:id", async (req: Request, res: Response) => {
+  try {
+    const { deleteDataChunk } = await import("./src/dataChunk");
+    await deleteDataChunk(req, res);
+  } catch (error) {
+    console.error("❌ Delete data chunk error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to delete data chunk";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+// 10. Pages endpoints
+app.post("/pages", async (req: Request, res: Response) => {
+  try {
+    const { createPage } = await import("./src/pageData");
+    await createPage(req, res);
+  } catch (error) {
+    console.error("❌ Create page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to create page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/pages", async (req: Request, res: Response) => {
+  try {
+    const { getAllPages } = await import("./src/pageData");
+    await getAllPages(req, res);
+  } catch (error) {
+    console.error("❌ Get all pages error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch pages";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.get("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { getPageBySlug } = await import("./src/pageData");
+    await getPageBySlug(req, res);
+  } catch (error) {
+    console.error("❌ Get page by slug error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to fetch page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.put("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { updatePage } = await import("./src/pageData");
+    await updatePage(req, res);
+  } catch (error) {
+    console.error("❌ Update page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+app.delete("/pages/:slug", async (req: Request, res: Response) => {
+  try {
+    const { deletePage } = await import("./src/pageData");
+    await deletePage(req, res);
+  } catch (error) {
+    console.error("❌ Delete page error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to delete page";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+// 11. Start server
 const port = parseInt(process.env.PORT || "8080", 10);
 
 app
