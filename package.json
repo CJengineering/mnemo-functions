@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "clean": "rm -rf dist && rm -rf node_modules/.cache",
-    "build": "npm run clean && tsc",
-    "build:fresh": "npm run clean && npm install && tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
-    "deploy": "npm run build && echo 'Ready for deployment'",
     "drizzle:push": "drizzle-kit push",
     "start:functions": "functions-framework --target=app",
     "dev": "ts-node index.ts",

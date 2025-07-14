@@ -1,12 +1,5 @@
 import { Request, Response } from "express";
 import { pool } from "../schema/db";
-
-// Helper function to validate UUID format
-function isValidUUID(id: string): boolean {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-}
 import {
   mapIncomingCollectionItem,
   collectionItemToDbFormat,
@@ -48,7 +41,7 @@ export async function createCollectionItem(req: Request, res: Response) {
       "prize",
       "partner",
     ];
-    const validStatuses = ["active", "inactive", "archived"];
+    const validStatuses = ["draft", "published"]; // Fixed to match database schema
 
     if (!validTypes.includes(type)) {
       return res.status(400).json({
@@ -133,10 +126,10 @@ export async function getCollectionItemById(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
-    if (!isValidUUID(id)) {
+    if (isNaN(Number(id))) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid UUID format" });
+        .json({ success: false, error: "Invalid ID format" });
     }
 
     const result = await pool.query(
@@ -168,10 +161,13 @@ export async function updateCollectionItem(req: Request, res: Response) {
     const { id } = req.params;
     const { title, description, type, data, metaData, status } = req.body;
 
-    if (!isValidUUID(id)) {
+    // Validate UUID format (collection items use UUIDs, not numeric IDs)
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid UUID format" });
+        .json({ success: false, error: "Invalid ID format" });
     }
 
     // Validate enum values if provided
@@ -187,7 +183,7 @@ export async function updateCollectionItem(req: Request, res: Response) {
       "prize",
       "partner",
     ];
-    const validStatuses = ["active", "inactive", "archived"];
+    const validStatuses = ["draft", "published"]; // Fixed to match database schema
 
     if (type && !validTypes.includes(type)) {
       return res.status(400).json({
@@ -276,10 +272,13 @@ export async function deleteCollectionItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
-    if (!isValidUUID(id)) {
+    // Validate UUID format (collection items use UUIDs, not numeric IDs)
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid UUID format" });
+        .json({ success: false, error: "Invalid ID format" });
     }
 
     const result = await pool.query(

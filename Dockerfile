@@ -22,8 +22,8 @@ COPY schema/ ./schema/
 COPY type.ts ./
 COPY tsconfig.json ./
 
-# Clean any previous builds and build TypeScript code
-RUN rm -rf dist && rm -rf node_modules/.cache && npx tsc
+# Build TypeScript code
+RUN npx tsc
 
 # Expose the port that the app will run on
 EXPOSE 8080
