@@ -95,7 +95,34 @@ interface ReferenceItem {
   id: string;
   slug: string;
 }
+export interface CollectionItemTeam {
+  id: string;
+  type: "team";
+  status: "published" | "draft";
+  slug: string;
+  title: string; // maps to "name"
+  created_at: string;
+  updated_at: string;
 
+  data: {
+    name: string;
+    nameArabic?: string;
+    position?: string;
+    positionArabic?: string;
+    photo: ImageField; // ✅ required
+    photoHires?: string; // URL
+    paragraphDescription: string; // ✅ required
+    biographyArabic?: string;
+    metaDescription?: string;
+    metaDescriptionArabic?: string;
+    altTextImage?: string;
+    altTextImageArabic?: string;
+    filter?: 'Leadership' | 'Team' | 'Advisory Committee' | 'Alumnus' | 'COP27 Youth Delegate';
+    order: number; // ✅ required
+    newsOnOff?: boolean;
+    tags?: { id: string; slug: string }[]; // multi-reference
+  };
+}
 export interface CollectionItemProgramme {
   id: string;
   type: "programme";

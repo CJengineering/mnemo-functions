@@ -4,6 +4,7 @@ import {
   CollectionItemNews,
   CollectionItemPost,
   CollectionItemSource,
+  CollectionItemTeam,
 } from "../../interface";
 import {
   IncomingEventData,
@@ -11,6 +12,7 @@ import {
   IncomingNewsData,
   IncomingPostData,
   IncomingSourceData,
+  IncomingTeamData,
   IncomingCollectionItem,
 } from "./incomingInterfaces";
 
@@ -221,6 +223,39 @@ export function mapIncomingSourceToCollectionItem(
   };
 }
 
+// Team Mapper
+export function mapIncomingTeamToCollectionItem(
+  incoming: IncomingTeamData
+): CollectionItemTeam {
+  const defaults = generateCollectionItemDefaults();
+
+  return {
+    ...defaults,
+    type: "team",
+    status: incoming.status || "draft",
+    slug: incoming.slug,
+    title: incoming.title,
+    data: {
+      name: incoming.name || incoming.title, // Use name if provided, otherwise use title
+      nameArabic: incoming.nameArabic,
+      position: incoming.position,
+      positionArabic: incoming.positionArabic,
+      photo: incoming.photo,
+      photoHires: incoming.photoHires,
+      paragraphDescription: incoming.paragraphDescription,
+      biographyArabic: incoming.biographyArabic,
+      metaDescription: incoming.metaDescription,
+      metaDescriptionArabic: incoming.metaDescriptionArabic,
+      altTextImage: incoming.altTextImage,
+      altTextImageArabic: incoming.altTextImageArabic,
+      filter: incoming.filter,
+      order: incoming.order,
+      newsOnOff: incoming.newsOnOff || false, // Default to false if not provided
+      tags: incoming.tags,
+    },
+  };
+}
+
 // Main mapper function that handles all types
 export function mapIncomingCollectionItem(
   incoming: IncomingCollectionItem
@@ -229,7 +264,8 @@ export function mapIncomingCollectionItem(
   | CollectionItemProgramme
   | CollectionItemNews
   | CollectionItemPost
-  | CollectionItemSource {
+  | CollectionItemSource
+  | CollectionItemTeam {
   switch (incoming.type) {
     case "event":
       return mapIncomingEventToCollectionItem(
@@ -246,6 +282,10 @@ export function mapIncomingCollectionItem(
     case "source":
       return mapIncomingSourceToCollectionItem(
         incoming.data as IncomingSourceData
+      );
+    case "team":
+      return mapIncomingTeamToCollectionItem(
+        incoming.data as IncomingTeamData
       );
     default:
       throw new Error(

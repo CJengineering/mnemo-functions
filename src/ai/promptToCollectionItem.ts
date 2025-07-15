@@ -13,7 +13,7 @@ const openai = process.env.OPENAI_API_KEY
 const AISuccessResponseSchema = z.object({
   status: z.literal("ok"),
   data: z.object({
-    type: z.enum(["event", "post", "programme", "news", "source"]),
+    type: z.enum(["event", "post", "programme", "news", "source", "team"]),
     data: z.record(z.any()), // Will be validated more specifically later
   }),
 });
@@ -272,11 +272,67 @@ If missing required fields, respond with:
 }
 
 IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
+
+  team: `You are an AI assistant that converts natural language descriptions into structured team member data.
+
+REQUIRED FIELDS for team members:
+- title: string (full name/title of the person)
+- slug: string (URL-friendly version of name, lowercase, hyphens instead of spaces)
+- status: "published" | "draft"
+- paragraphDescription: string (brief description of the person)
+- order: number (display order, use 1 if not specified)
+- photo: object with url and alt text (profile photo)
+
+OPTIONAL FIELDS:
+- name: string (if different from title)
+- nameArabic: string
+- position: string (job title/role)
+- positionArabic: string
+- biographyArabic: string
+- metaDescription: string
+- metaDescriptionArabic: string
+- altTextImage: string
+- altTextImageArabic: string
+- filter: "Leadership" | "Team" | "Advisory Committee" | "Alumnus" | "COP27 Youth Delegate"
+- newsOnOff: boolean (whether to show in news sections)
+- photoHires: string (high-resolution photo URL)
+- tags: array of objects with id and slug
+
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "team",
+    "data": { 
+      "title": "Dr. Jane Smith",
+      "slug": "dr-jane-smith",
+      "status": "published",
+      "paragraphDescription": "Brief description of the person",
+      "order": 1,
+      "photo": {
+        "url": "https://example.com/photo.jpg",
+        "alt": "Dr. Jane Smith"
+      }
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for team member creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 };
 
 export interface PromptToItemRequest {
   prompt: string;
-  type?: "event" | "post" | "programme" | "news" | "source";
+  type?: "event" | "post" | "programme" | "news" | "source" | "team";
   context?: string; // Additional context from user
 }
 
@@ -480,6 +536,25 @@ async function inferCollectionType(
   ) {
     return "source";
   }
+  if (
+    lowerPrompt.includes("team") ||
+    lowerPrompt.includes("staff") ||
+    lowerPrompt.includes("member") ||
+    lowerPrompt.includes("person") ||
+    lowerPrompt.includes("employee") ||
+    lowerPrompt.includes("researcher") ||
+    lowerPrompt.includes("director") ||
+    lowerPrompt.includes("manager") ||
+    lowerPrompt.includes("leader") ||
+    lowerPrompt.includes("professor") ||
+    lowerPrompt.includes("dr.") ||
+    lowerPrompt.includes("ceo") ||
+    lowerPrompt.includes("cto") ||
+    lowerPrompt.includes("biography") ||
+    lowerPrompt.includes("bio")
+  ) {
+    return "team";
+  }
 
   // Default to event if unclear
   return "event";
@@ -521,6 +596,15 @@ function generateSuggestions(missingFields: string[], type: string): string[] {
         suggestions.push(
           'Please specify if this should be "published" or "draft"'
         );
+        break;
+      case "paragraphDescription":
+        suggestions.push("Please provide a brief description of this person");
+        break;
+      case "photo":
+        suggestions.push("Please provide a profile photo URL");
+        break;
+      case "order":
+        suggestions.push("Please specify the display order (e.g., 1, 2, 3...)");
         break;
       default:
         suggestions.push(`Please provide information about: ${field}`);

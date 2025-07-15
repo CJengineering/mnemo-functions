@@ -220,16 +220,46 @@ export interface IncomingSourceData {
   logoNative?: IncomingImageField;
 }
 
+// Incoming Team Data from Frontend Form
+export interface IncomingTeamData {
+  title: string; // This will map to both title and data.name
+  slug: string;
+  status?: "published" | "draft";
+
+  // Team member specific fields
+  name?: string; // Optional, will use title if not provided
+  nameArabic?: string;
+  position?: string;
+  positionArabic?: string;
+  paragraphDescription: string;
+  biographyArabic?: string;
+  metaDescription?: string;
+  metaDescriptionArabic?: string;
+  altTextImage?: string;
+  altTextImageArabic?: string;
+  filter?: 'Leadership' | 'Team' | 'Advisory Committee' | 'Alumnus' | 'COP27 Youth Delegate';
+  order: number;
+  newsOnOff?: boolean;
+
+  // Media
+  photo: IncomingImageField; // Required
+  photoHires?: string; // URL
+
+  // Relations
+  tags?: IncomingReferenceItem[];
+}
+
 // Union type for all incoming data types
 export type IncomingCollectionItemData =
   | IncomingEventData
   | IncomingProgrammeData
   | IncomingNewsData
   | IncomingPostData
-  | IncomingSourceData;
+  | IncomingSourceData
+  | IncomingTeamData;
 
 // Type discriminator for the frontend to specify which type they're sending
 export interface IncomingCollectionItem {
-  type: "event" | "programme" | "news" | "post" | "source";
+  type: "event" | "programme" | "news" | "post" | "source" | "team";
   data: IncomingCollectionItemData;
 }
