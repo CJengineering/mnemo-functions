@@ -131,19 +131,24 @@ app.put("/api/collection-items/:id", async (req: Request, res: Response) => {
 });
 
 // 5d2. PUT update collection item by slug
-app.put("/api/collection-items/slug/:slug", async (req: Request, res: Response) => {
-  try {
-    const { updateCollectionItemBySlug } = await import("./src/collectionItem");
-    await updateCollectionItemBySlug(req, res);
-  } catch (error) {
-    console.error("❌ Update collection item by slug error:", error);
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Failed to update collection item by slug";
-    res.status(500).json({ success: false, error: errorMessage });
+app.put(
+  "/api/collection-items/slug/:slug",
+  async (req: Request, res: Response) => {
+    try {
+      const { updateCollectionItemBySlug } = await import(
+        "./src/collectionItem"
+      );
+      await updateCollectionItemBySlug(req, res);
+    } catch (error) {
+      console.error("❌ Update collection item by slug error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update collection item by slug";
+      res.status(500).json({ success: false, error: errorMessage });
+    }
   }
-});
+);
 
 // 5e. DELETE collection item by ID
 app.delete("/api/collection-items/:id", async (req: Request, res: Response) => {
