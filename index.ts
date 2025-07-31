@@ -97,6 +97,24 @@ app.get("/api/collection-items/:id", async (req: Request, res: Response) => {
   }
 });
 
+// 5c2. GET collection item by slug
+app.get(
+  "/api/collection-items/slug/:slug",
+  async (req: Request, res: Response) => {
+    try {
+      const { getCollectionItemBySlug } = await import("./src/collectionItem");
+      await getCollectionItemBySlug(req, res);
+    } catch (error) {
+      console.error("❌ Get collection item by slug error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch collection item by slug";
+      res.status(500).json({ success: false, error: errorMessage });
+    }
+  }
+);
+
 // 5d. PUT update collection item by ID
 app.put("/api/collection-items/:id", async (req: Request, res: Response) => {
   try {
@@ -108,6 +126,21 @@ app.put("/api/collection-items/:id", async (req: Request, res: Response) => {
       error instanceof Error
         ? error.message
         : "Failed to update collection item";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+// 5d2. PUT update collection item by slug
+app.put("/api/collection-items/slug/:slug", async (req: Request, res: Response) => {
+  try {
+    const { updateCollectionItemBySlug } = await import("./src/collectionItem");
+    await updateCollectionItemBySlug(req, res);
+  } catch (error) {
+    console.error("❌ Update collection item by slug error:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to update collection item by slug";
     res.status(500).json({ success: false, error: errorMessage });
   }
 });

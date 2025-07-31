@@ -1,0 +1,27 @@
+# 🧑‍💼 Add First Team Member - curl command
+# Testing the team mapper integration
+
+curl -X POST http://localhost:8080/api/collection-items \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "team",
+    "data": {
+      "title": "Dr. Sarah Johnson",
+      "slug": "dr-sarah-johnson",
+      "status": "published",
+      "name": "Sarah Johnson",
+      "position": "Chief Technology Officer",
+      "paragraphDescription": "Dr. Sarah Johnson is a pioneering researcher in artificial intelligence and machine learning, leading breakthrough innovations in community-driven technology solutions.",
+      "order": 1,
+      "filter": "Leadership",
+      "newsOnOff": true,
+      "photo": {
+        "url": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
+        "alt": "Dr. Sarah Johnson profile photo"
+      },
+      "tags": [
+        { "id": "tag-ai", "slug": "artificial-intelligence" },
+        { "id": "tag-leadership", "slug": "leadership" }
+      ]
+    }
+  }'

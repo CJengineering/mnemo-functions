@@ -237,7 +237,12 @@ export interface IncomingTeamData {
   metaDescriptionArabic?: string;
   altTextImage?: string;
   altTextImageArabic?: string;
-  filter?: 'Leadership' | 'Team' | 'Advisory Committee' | 'Alumnus' | 'COP27 Youth Delegate';
+  filter?:
+    | "Leadership"
+    | "Team"
+    | "Advisory Committee"
+    | "Alumnus"
+    | "COP27 Youth Delegate";
   order: number;
   newsOnOff?: boolean;
 

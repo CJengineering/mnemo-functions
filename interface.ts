@@ -117,7 +117,12 @@ export interface CollectionItemTeam {
     metaDescriptionArabic?: string;
     altTextImage?: string;
     altTextImageArabic?: string;
-    filter?: 'Leadership' | 'Team' | 'Advisory Committee' | 'Alumnus' | 'COP27 Youth Delegate';
+    filter?:
+      | "Leadership"
+      | "Team"
+      | "Advisory Committee"
+      | "Alumnus"
+      | "COP27 Youth Delegate";
     order: number; // ✅ required
     newsOnOff?: boolean;
     tags?: { id: string; slug: string }[]; // multi-reference

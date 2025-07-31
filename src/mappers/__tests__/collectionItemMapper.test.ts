@@ -262,8 +262,10 @@ describe("Collection Item Mappers", () => {
         nameArabic: "جون سميث",
         position: "Chief Technology Officer",
         positionArabic: "كبير موظفي التكنولوجيا",
-        paragraphDescription: "Dr. Smith is a leading expert in AI and machine learning.",
-        biographyArabic: "الدكتور سميث خبير رائد في الذكاء الاصطناعي والتعلم الآلي.",
+        paragraphDescription:
+          "Dr. Smith is a leading expert in AI and machine learning.",
+        biographyArabic:
+          "الدكتور سميث خبير رائد في الذكاء الاصطناعي والتعلم الآلي.",
         metaDescription: "CTO and AI expert",
         metaDescriptionArabic: "كبير موظفي التكنولوجيا وخبير الذكاء الاصطناعي",
         altTextImage: "Dr. John Smith profile photo",
@@ -297,10 +299,13 @@ describe("Collection Item Mappers", () => {
           nameArabic: "جون سميث",
           position: "Chief Technology Officer",
           positionArabic: "كبير موظفي التكنولوجيا",
-          paragraphDescription: "Dr. Smith is a leading expert in AI and machine learning.",
-          biographyArabic: "الدكتور سميث خبير رائد في الذكاء الاصطناعي والتعلم الآلي.",
+          paragraphDescription:
+            "Dr. Smith is a leading expert in AI and machine learning.",
+          biographyArabic:
+            "الدكتور سميث خبير رائد في الذكاء الاصطناعي والتعلم الآلي.",
           metaDescription: "CTO and AI expert",
-          metaDescriptionArabic: "كبير موظفي التكنولوجيا وخبير الذكاء الاصطناعي",
+          metaDescriptionArabic:
+            "كبير موظفي التكنولوجيا وخبير الذكاء الاصطناعي",
           altTextImage: "Dr. John Smith profile photo",
           altTextImageArabic: "صورة الدكتور جون سميث الشخصية",
           filter: "Leadership",
@@ -337,7 +342,9 @@ describe("Collection Item Mappers", () => {
       expect(result.title).toBe("Jane Doe");
       expect(result.slug).toBe("jane-doe");
       expect(result.data.name).toBe("Jane Doe"); // Uses title when name not provided
-      expect(result.data.paragraphDescription).toBe("Software Engineer at our organization.");
+      expect(result.data.paragraphDescription).toBe(
+        "Software Engineer at our organization."
+      );
       expect(result.data.order).toBe(2);
       expect(result.data.photo).toEqual({
         url: "https://example.com/jane-doe.jpg",
@@ -348,12 +355,12 @@ describe("Collection Item Mappers", () => {
     });
 
     it("should handle team member with all possible filter types", () => {
-      const filters: Array<IncomingTeamData['filter']> = [
-        'Leadership',
-        'Team',
-        'Advisory Committee',
-        'Alumnus',
-        'COP27 Youth Delegate'
+      const filters: Array<IncomingTeamData["filter"]> = [
+        "Leadership",
+        "Team",
+        "Advisory Committee",
+        "Alumnus",
+        "COP27 Youth Delegate",
       ];
 
       filters.forEach((filter, index) => {
@@ -537,7 +544,9 @@ describe("Integration Test", () => {
     expect(dbFormat.type).toBe("team");
     expect(dbFormat.status).toBe("published");
 
-    expect(dbFormat.data.paragraphDescription).toBe("A team member for integration testing");
+    expect(dbFormat.data.paragraphDescription).toBe(
+      "A team member for integration testing"
+    );
     expect(dbFormat.data.order).toBe(5);
     expect(dbFormat.data.filter).toBe("Team");
     expect(dbFormat.data.photo).toEqual({

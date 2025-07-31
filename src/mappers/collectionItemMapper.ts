@@ -284,9 +284,7 @@ export function mapIncomingCollectionItem(
         incoming.data as IncomingSourceData
       );
     case "team":
-      return mapIncomingTeamToCollectionItem(
-        incoming.data as IncomingTeamData
-      );
+      return mapIncomingTeamToCollectionItem(incoming.data as IncomingTeamData);
     default:
       throw new Error(
         `Unknown collection item type: ${(incoming as any).type}`

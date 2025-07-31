@@ -424,3 +424,172 @@ export async function createCollectionItemFromForm(
     res.status(500).json({ success: false, error: errorMessage });
   }
 }
+
+// GET Collection Item by Slug
+export async function getCollectionItemBySlug(req: Request, res: Response) {
+  try {
+    const { slug } = req.params;
+
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        error: "Slug parameter is required",
+      });
+    }
+
+    console.log(`🔍 Fetching collection item with slug: ${slug}`);
+
+    const result = await pool.query(
+      "SELECT * FROM collection_item WHERE slug = $1",
+      [slug]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Collection item not found",
+      });
+    }
+
+    const collectionItem = result.rows[0];
+    console.log(`✅ Found collection item: ${collectionItem.title}`);
+
+    res.json({ success: true, collectionItem });
+  } catch (error) {
+    console.error("❌ getCollectionItemBySlug error:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch collection item";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+// UPDATE Collection Item by Slug
+export async function updateCollectionItemBySlug(req: Request, res: Response) {
+  try {
+    const { slug } = req.params;
+    const { title, description, type, data, metaData, status } = req.body;
+
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        error: "Slug parameter is required",
+      });
+    }
+
+    // Validate enum values if provided
+    const validTypes = [
+      "event",
+      "post",
+      "programme",
+      "news",
+      "team",
+      "innovation",
+      "award",
+      "publication",
+      "prize",
+      "partner",
+    ];
+    const validStatuses = ["draft", "published"];
+
+    if (type && !validTypes.includes(type)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
+      });
+    }
+
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    // Check if collection item exists
+    const existingResult = await pool.query(
+      "SELECT * FROM collection_item WHERE slug = $1",
+      [slug]
+    );
+
+    if (existingResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Collection item not found",
+      });
+    }
+
+    console.log(`🔄 Updating collection item with slug: ${slug}`);
+
+    // Build dynamic update query
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
+
+    if (title !== undefined) {
+      updates.push(`title = $${paramCount++}`);
+      values.push(title);
+    }
+
+    if (description !== undefined) {
+      updates.push(`description = $${paramCount++}`);
+      values.push(description);
+    }
+
+    if (type !== undefined) {
+      updates.push(`type = $${paramCount++}`);
+      values.push(type);
+    }
+
+    if (data !== undefined) {
+      updates.push(`data = $${paramCount++}`);
+      values.push(JSON.stringify(data));
+    }
+
+    if (metaData !== undefined) {
+      updates.push(`meta_data = $${paramCount++}`);
+      values.push(JSON.stringify(metaData));
+    }
+
+    if (status !== undefined) {
+      updates.push(`status = $${paramCount++}`);
+      values.push(status);
+    }
+
+    // Always update the updated_at timestamp
+    updates.push(`updated_at = $${paramCount++}`);
+    values.push(new Date().toISOString());
+
+    if (updates.length === 1) {
+      // Only updated_at was added
+      return res.status(400).json({
+        success: false,
+        error: "No valid fields provided for update",
+      });
+    }
+
+    // Add slug to values for WHERE clause
+    values.push(slug);
+
+    const updateQuery = `
+      UPDATE collection_item 
+      SET ${updates.join(", ")} 
+      WHERE slug = $${paramCount} 
+      RETURNING *
+    `;
+
+    const result = await pool.query(updateQuery, values);
+    const updatedItem = result.rows[0];
+
+    console.log(`✅ Updated collection item: ${updatedItem.title}`);
+    res.json({ success: true, collectionItem: updatedItem });
+  } catch (error) {
+    console.error("❌ updateCollectionItemBySlug error:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Failed to update collection item";
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
