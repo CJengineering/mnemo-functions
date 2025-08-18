@@ -70,15 +70,17 @@ export interface CollectionItemEvent {
     organisers?: ReferenceItem[];
     partners?: ReferenceItem[];
     participantsAffiliatedInstitutions?: ReferenceItem[];
+    withRepresentativesFrom?: ReferenceItem[];
 
     moreDetails?: string;
+    moreInformation?: string;
     imageGallery?: ImageField[];
     galleryPhotoCredits?: string;
 
     newsOn?: boolean;
     customCodeForHidingWeglot?: string;
 
-    group?: "COP27" | "Jameel House" | "COP28";
+    group?: string;
 
     inTheMedia?: string;
 

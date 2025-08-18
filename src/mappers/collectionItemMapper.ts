@@ -39,19 +39,44 @@ export function mapIncomingEventToCollectionItem(
     slug: incoming.slug,
     title: incoming.title,
     data: {
+      // Boolean toggles
       pushToGR: incoming.pushToGR,
-      programmeLabel: incoming.programmeLabel,
-      relatedProgrammes: incoming.relatedProgrammes,
+      featured: incoming.featured,
       videoAsHero: incoming.videoAsHero,
+      newsOn: incoming.newsOnOff,
+      moreDetailsOn: incoming.moreDetailsOnOff,
+      inTheMediaOn: incoming.inTheMediaOnOff,
+
+      // Core references
+      programmeLabel: incoming.programmeLabel,
+      relatedProgrammes: incoming.relatedProgrammes || [],
+      relatedPeople: incoming.relatedPeople || [],
+      organisers: incoming.organisers || [],
+      partners: incoming.partners || [],
+      withRepresentativesFrom: incoming.withRepresentativesFrom || [],
+      tags: incoming.tags || [],
+
+      // Images
       thumbnail: incoming.thumbnail,
       heroImage: incoming.heroImage,
-      openGraphImage: incoming.heroImage, // fallback to heroImage if not provided
-      featured: incoming.featured,
+      openGraphImage: incoming.openGraphImage || incoming.heroImage,
+      imageGallery: incoming.imageGallery || [],
+      galleryPhotoCredits: incoming.galleryPhotoCredits,
+
+      // Textual content
       arabicTitle: incoming.arabicTitle,
       seoMetaDescription: incoming.seoMetaDescription,
       seoTitle: incoming.seoTitle,
       teaserText: incoming.teaserText,
       shortDescription: incoming.shortDescription,
+      moreDetails: incoming.moreDetails,
+      moreInformation: incoming.moreInformation,
+      signupEmbed: incoming.signupEmbed,
+      relatedPeopleRichText: incoming.relatedPeopleRichText,
+      inTheMedia: incoming.inTheMedia,
+      customCodeForHidingWeglot: incoming.customCodeForHidingWeglot,
+
+      // Dates / location
       eventDate: incoming.eventDate,
       endDate: incoming.endDate,
       time: incoming.time,
@@ -61,13 +86,23 @@ export function mapIncomingEventToCollectionItem(
       livestreamLink: incoming.livestreamLink,
       attendanceType: incoming.attendanceType,
       contactDetails: incoming.contactDetails,
+
+      // Videos
       rsvpLink: incoming.rsvpLink,
+      buttonCtaText: incoming.buttonCtaText,
       mainVideo: incoming.mainVideo,
-      tags: incoming.tags,
-      relatedPeople: incoming.relatedPeople,
+      mainVideoEmbedCode: incoming.mainVideoEmbedCode,
+      video2: incoming.video2,
+      video2EmbedCode: incoming.video2EmbedCode,
+      video3: incoming.video3,
+      video3EmbedCode: incoming.video3EmbedCode,
+
+      // Dropdowns
+      group: incoming.group 
     },
   };
 }
+
 
 // Programme Mapper
 export function mapIncomingProgrammeToCollectionItem(

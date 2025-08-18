@@ -13,49 +13,80 @@ interface IncomingReferenceItem {
 
 // Incoming Event Data from Frontend Form
 export interface IncomingEventData {
+  openGraphImage: IncomingImageField;
   title: string;
   description?: string;
   slug: string;
-  status?: "published" | "draft";
+  status?: 'published' | 'draft';
 
   // Event specific fields
   arabicTitle?: string;
+
   seoTitle?: string;
   seoMetaDescription?: string;
   teaserText?: string;
   shortDescription?: string;
+  richText?: string;
 
   // Event details
+
   eventDate?: string;
   endDate?: string;
   time?: string;
   city?: string;
   address?: string;
   locationLink?: string;
+  extraLocationInformation?: string;
+
+  // Links and CTAs
+  rsvpLink?: string;
+  contactDetails?: string;
+  livestreamLink?: string;
+  ctaLink?: string;
+  buttonCtaText?: string;
+  attendanceType?: string;
 
   // Media
   thumbnail?: IncomingImageField;
   heroImage?: IncomingImageField;
-  mainVideo?: string;
+  imageGallery?: IncomingImageField[];
+  galleryPhotoCredits?: string;
 
-  // Relations
+  // Video fields
+  videoAsHero?: boolean;
+  mainVideo?: string;
+  mainVideoEmbedCode?: string;
+  video2?: string;
+  video2EmbedCode?: string;
+  video3?: string;
+  video3EmbedCode?: string;
+
+  // Rich text content fields
+  signupEmbed?: string;
+  moreInformation?: string;
+  moreDetails?: string;
+  relatedPeopleRichText?: string;
+  inTheMedia?: string;
+  customCodeForHidingWeglot?: string;
+
+  // Boolean toggles
+  pushToGr?: boolean;
+  pushToGR?: boolean; // Keep both for compatibility
+  newsOnOff?: boolean;
+  moreDetailsOnOff?: boolean;
+  inTheMediaOnOff?: boolean;
+  featured?: boolean;
+
+  // References
+  group?: string;
   programmeLabel?: IncomingReferenceItem;
   relatedProgrammes?: IncomingReferenceItem[];
   tags?: IncomingReferenceItem[];
   relatedPeople?: IncomingReferenceItem[];
-
-  // Flags
-  featured?: boolean;
-  pushToGR?: boolean;
-  videoAsHero?: boolean;
-
-  // RSVP/Contact
-  rsvpLink?: string;
-  contactDetails?: string;
-  livestreamLink?: string;
-  attendanceType?: string;
+  organisers?: IncomingReferenceItem[];
+  partners?: IncomingReferenceItem[];
+  withRepresentativesFrom?: IncomingReferenceItem[];
 }
-
 // Incoming Programme Data from Frontend Form
 export interface IncomingProgrammeData {
   title: string;
@@ -64,6 +95,14 @@ export interface IncomingProgrammeData {
   status?: "published" | "draft";
 
   // Programme specific fields
+  type?:
+    | "Centre"
+    | "Fund"
+    | "Scholarship"
+    | "Project"
+    | "Programme"
+    | "Lab"
+    | "Community Jameel";
   nameArabic?: string;
   shortNameEnglish?: string;
   shortNameArabic?: string;
@@ -73,6 +112,9 @@ export interface IncomingProgrammeData {
   missionArabic?: string;
   summaryEnglish?: string;
   summaryArabic?: string;
+  summaryLongEnglish?: string;
+  summaryLongArabic?: string;
+  oldMissionEnglish?: string;
   researchEnglish?: string;
   researchArabic?: string;
 
@@ -85,8 +127,20 @@ export interface IncomingProgrammeData {
   // Media
   logoSvgDark?: IncomingImageField;
   logoSvgLight?: IncomingImageField;
+  logoSvgDarkOriginal?: IncomingImageField;
+  logoSvgLightOriginal?: IncomingImageField;
   heroSquare?: IncomingImageField;
   heroWide?: IncomingImageField;
+  hero1x1?: IncomingImageField;
+  hero16x9?: IncomingImageField;
+  heroImage?: IncomingImageField;
+  thumbnail?: IncomingImageField;
+  openGraph?: IncomingImageField;
+
+  // Video & Links
+  mainVideo?: string;
+  customLink?: string;
+  buttonText?: string;
 
   // Location
   longitude?: string;
@@ -97,11 +151,28 @@ export interface IncomingProgrammeData {
   linkedin?: string;
   instagram?: string;
   twitter?: string;
+  youtube?: string;
+  facebook?: string;
 
   // Relations
   partners?: IncomingReferenceItem[];
   leadership?: IncomingReferenceItem[];
   relatedProgrammes?: IncomingReferenceItem[];
+  features?: IncomingReferenceItem[];
+
+  // Impact metrics
+  impact01?: string;
+  impact01TitleArabic?: string;
+  impact02?: string;
+  impact02TitleArabic?: string;
+  impact03?: string;
+  impact03TitleArabic?: string;
+  impact04?: string;
+  impact04TitleArabic?: string;
+  impact05?: string;
+  impact05TitleArabic?: string;
+  impact06?: string;
+  impact06TitleArabic?: string;
 
   // Flags
   lab?: boolean;

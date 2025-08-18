@@ -71,6 +71,11 @@ describe("Collection Item Mappers", () => {
           { id: "tag-1", slug: "innovation" },
           { id: "tag-2", slug: "technology" },
         ],
+        openGraphImage: {
+          url: "https://example.com/hero.jpg",
+          alt: "Event hero image",
+        },
+        relatedProgrammes: undefined,
       };
 
       const result = mapIncomingEventToCollectionItem(incomingEvent);
@@ -85,9 +90,21 @@ describe("Collection Item Mappers", () => {
         updated_at: mockDate,
         data: {
           pushToGR: undefined,
-          programmeLabel: { id: "prog-1", slug: "test-programme" },
-          relatedProgrammes: undefined,
+          featured: true,
           videoAsHero: undefined,
+          newsOn: undefined,
+          moreDetailsOn: undefined,
+          inTheMediaOn: undefined,
+          programmeLabel: { id: "prog-1", slug: "test-programme" },
+          relatedProgrammes: [],
+          relatedPeople: [],
+          organisers: [],
+          partners: [],
+          withRepresentativesFrom: [],
+          tags: [
+            { id: "tag-1", slug: "innovation" },
+            { id: "tag-2", slug: "technology" },
+          ],
           thumbnail: {
             url: "https://example.com/thumb.jpg",
             alt: "Event thumbnail",
@@ -100,12 +117,19 @@ describe("Collection Item Mappers", () => {
             url: "https://example.com/hero.jpg",
             alt: "Event hero image",
           },
-          featured: true,
+          imageGallery: [],
+          galleryPhotoCredits: undefined,
           arabicTitle: "حدث تجريبي",
           seoMetaDescription: undefined,
           seoTitle: undefined,
           teaserText: undefined,
           shortDescription: undefined,
+          moreDetails: undefined,
+          moreInformation: undefined,
+          signupEmbed: undefined,
+          relatedPeopleRichText: undefined,
+          inTheMedia: undefined,
+          customCodeForHidingWeglot: undefined,
           eventDate: "2025-08-01",
           endDate: "2025-08-02",
           time: undefined,
@@ -116,12 +140,14 @@ describe("Collection Item Mappers", () => {
           attendanceType: undefined,
           contactDetails: undefined,
           rsvpLink: undefined,
+          buttonCtaText: undefined,
           mainVideo: undefined,
-          tags: [
-            { id: "tag-1", slug: "innovation" },
-            { id: "tag-2", slug: "technology" },
-          ],
-          relatedPeople: undefined,
+          mainVideoEmbedCode: undefined,
+          video2: undefined,
+          video2EmbedCode: undefined,
+          video3: undefined,
+          video3EmbedCode: undefined,
+          group: undefined,
         },
       });
     });
@@ -130,6 +156,10 @@ describe("Collection Item Mappers", () => {
       const minimalEvent: IncomingEventData = {
         title: "Minimal Event",
         slug: "minimal-event",
+        openGraphImage: {
+          url: "https://example.com/hero.jpg",
+          alt: "Event hero image",
+        },
       };
 
       const result = mapIncomingEventToCollectionItem(minimalEvent);
