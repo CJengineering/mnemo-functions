@@ -107,29 +107,49 @@ export interface CollectionItemTeam {
   updated_at: string;
 
   data: {
+    // Personal
     name: string;
     nameArabic?: string;
     position?: string;
     positionArabic?: string;
-    photo: ImageField; // ✅ required
+
+    // Images (photo required)
+    photo: ImageField;
     photoHires?: string; // URL
-    paragraphDescription: string; // ✅ required
-    biographyArabic?: string;
-    metaDescription?: string;
-    metaDescriptionArabic?: string;
     altTextImage?: string;
     altTextImageArabic?: string;
+
+    // Bio
+    paragraphDescription: string;
+    biographyArabic?: string;
+
+    // Meta
+    metaDescription?: string;
+    metaDescriptionArabic?: string;
+
+    // Categorization
     filter?:
       | "Leadership"
       | "Team"
       | "Advisory Committee"
       | "Alumnus"
       | "COP27 Youth Delegate";
-    order: number; // ✅ required
+    order: number;
+
+    // Settings
     newsOnOff?: boolean;
-    tags?: { id: string; slug: string }[]; // multi-reference
+    tags?: ReferenceItem[];
   };
 }
+type ProgrammeType =
+  | "Centre"
+  | "Fund"
+  | "Scholarship"
+  | "Project"
+  | "Programme"
+  | "Lab"
+  | "Community Jameel";
+
 export interface CollectionItemProgramme {
   id: string;
   type: "programme";
@@ -143,7 +163,8 @@ export interface CollectionItemProgramme {
     lab?: boolean;
     pushToGR?: boolean;
 
-    type?: string; // one of: Centre, Fund, Scholarship, Project, Programme, Lab, Community Jameel
+    // Programme classification (kept as 'type' inside data)
+    type?: ProgrammeType;
     customLink?: string;
 
     nameArabic?: string;
@@ -152,7 +173,9 @@ export interface CollectionItemProgramme {
 
     missionEnglish?: string;
     missionArabic?: string;
-    description?: string; // deprecated
+    /** Deprecated */
+    description?: string;
+    oldMissionEnglish?: string;
 
     summaryEnglish?: string;
     summaryArabic?: string;
@@ -168,25 +191,35 @@ export interface CollectionItemProgramme {
     headquartersArabic?: string;
     headquartersEnglish?: string;
 
+    // Logos
     logoSvgDark?: ImageField;
     logoSvgLight?: ImageField;
-    logoSvgDarkOriginalRatio?: ImageField;
-    logoSvgLightOriginalRatio?: ImageField;
+    logoSvgDarkOriginal?: ImageField; // ✅ align with mapper
+    logoSvgLightOriginal?: ImageField; // ✅ align with mapper
 
+    // Hero / images
     heroSquare?: ImageField; // 1x1
     heroWide?: ImageField; // 16x9
+    hero1x1?: ImageField; // additional 1x1 format
+    hero16x9?: ImageField; // additional 16x9 format
+    heroImage?: ImageField; // ✅ mapper uses this
+    thumbnail?: ImageField; // additional thumbnail field
     openGraph?: ImageField;
 
+    // Video & links
     mainVideo?: string;
 
+    // Relations
     features?: ReferenceItem[];
     partners?: ReferenceItem[];
     leadership?: ReferenceItem[];
     relatedProgrammes?: ReferenceItem[];
 
+    // Location
     longitude?: string;
     latitude?: string;
 
+    // External links
     website?: string;
     buttonText?: string;
 
@@ -196,8 +229,10 @@ export interface CollectionItemProgramme {
     youtube?: string;
     facebook?: string;
 
+    // Ordering
     order?: number;
 
+    // Impact metrics
     impact01?: string;
     impact01Title?: string;
     impact01TitleArabic?: string;
@@ -241,9 +276,10 @@ export interface CollectionItemNews {
     externalLink: string;
     datePublished: string;
 
-    sources: ReferenceItem;
-    programmeLabel: ReferenceItem;
-    relatedProgrammes: ReferenceItem[];
+    // Optional to align with incoming payloads
+    sources?: ReferenceItem;
+    programmeLabel?: ReferenceItem;
+    relatedProgrammes?: ReferenceItem[];
 
     people?: ReferenceItem[];
     innovations?: ReferenceItem[];
@@ -257,10 +293,10 @@ export interface CollectionItemNews {
     thumbnail?: ImageField;
     heroImage?: ImageField;
 
-    imageAltTextEnglish?: string; // optionally part of `thumbnail.alt`
+    imageAltTextEnglish?: string; // also copied into image.alt if not provided
     imageAltTextArabic?: string;
 
-    relatedTeamMembers?: ReferenceItem[];
+    relatedTeamMembers?: ReferenceItem[]; // from incoming.relatedCjTeamMembers
     tags?: ReferenceItem[];
 
     removeFromNewsGrid?: boolean;
@@ -295,54 +331,62 @@ export interface CollectionItemPost {
   updated_at: string;
 
   data: {
+    // Flags
     arabicCompleteIncomplete?: boolean;
-    arabicTitle?: string;
     pushToGR?: boolean;
+    featured?: boolean;
+    sitemapIndexing?: boolean;
 
+    // Titles / relations
+    arabicTitle?: string;
     programmeLabel?: ReferenceItem;
     relatedProgrammes?: ReferenceItem[];
 
+    // Content
     bulletPointsEnglish?: string;
     bulletPointsArabic?: string;
+    bodyEnglish?: string;
+    bodyArabic?: string;
 
+    // Video
     videoAsHero?: boolean;
     heroVideoYoutubeId?: string;
     heroVideoArabicYoutubeId?: string;
 
+    // Media (required)
     thumbnail: ImageField;
     mainImage: ImageField;
     openGraphImage: ImageField;
+    // Also keep the source hero image you receive (useful for fallbacks/edits)
+    heroImage?: ImageField;
 
+    // Dates / location
     datePublished: string;
-
     location?: string;
     locationArabic?: string;
 
+    // SEO
     seoTitle: string;
     seoTitleArabic?: string;
     seoMeta: string;
     seoMetaArabic?: string;
 
-    bodyEnglish?: string;
-    bodyArabic?: string;
-
-    altTextHeroImage?: string; // optional: could be merged with mainImage.alt
+    // Image metadata
+    altTextHeroImage?: string;
     altTextHeroImageArabic?: string;
-
     photoCreditHeroImage?: string;
     photoCreditHeroImageArabic?: string;
 
+    // Taxonomy / relations
     tags?: ReferenceItem[];
     blogCategory?: ReferenceItem;
-
-    featured?: boolean;
-
-    imageCarousel?: ImageField[];
-    imageGalleryCreditsArabic?: string;
-    imageGalleryCredits?: string;
-
     relatedEvent?: ReferenceItem;
     people?: ReferenceItem[];
     innovations?: ReferenceItem[];
+
+    // Gallery
+    imageCarousel?: ImageField[];
+    imageGalleryCredits?: string;
+    imageGalleryCreditsArabic?: string;
   };
 }

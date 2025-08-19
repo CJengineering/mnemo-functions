@@ -259,6 +259,10 @@ describe("Collection Item Mappers", () => {
           url: "https://example.com/post-main.jpg",
           alt: "Main image",
         },
+        heroImage: {
+          url: "https://example.com/post-hero.jpg",
+          alt: "Hero image",
+        },
         openGraphImage: {
           url: "https://example.com/post-og.jpg",
           alt: "Open graph image",
@@ -357,6 +361,7 @@ describe("Collection Item Mappers", () => {
     it("should handle minimal team data with defaults", () => {
       const minimalTeam: IncomingTeamData = {
         title: "Jane Doe",
+        name: "Jane Doe",
         slug: "jane-doe",
         paragraphDescription: "Software Engineer at our organization.",
         order: 2,
@@ -396,6 +401,7 @@ describe("Collection Item Mappers", () => {
       filters.forEach((filter, index) => {
         const teamMember: IncomingTeamData = {
           title: `Person ${index + 1}`,
+          name: `Person ${index + 1}`,
           slug: `person-${index + 1}`,
           paragraphDescription: `Description for person ${index + 1}`,
           order: index + 1,

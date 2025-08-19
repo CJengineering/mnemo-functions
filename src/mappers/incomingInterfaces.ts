@@ -185,7 +185,7 @@ export interface IncomingNewsData {
   title: string;
   description?: string;
   slug: string;
-  status?: "published" | "draft";
+  status?: 'published' | 'draft';
 
   // News specific fields
   arabicTitle?: string;
@@ -200,14 +200,19 @@ export interface IncomingNewsData {
   // Media
   thumbnail?: IncomingImageField;
   heroImage?: IncomingImageField;
+  imageAltTextEnglish?: string;
+  imageAltTextArabic?: string;
 
-  // Relations (required for news)
-  sources: IncomingReferenceItem;
-  programmeLabel: IncomingReferenceItem;
-  relatedProgrammes: IncomingReferenceItem[];
+  // Relations (optional for news)
+  sources?: IncomingReferenceItem;
+  programmeLabel?: IncomingReferenceItem;
+  relatedProgrammes?: IncomingReferenceItem[];
+
+  // People relations
+  people?: IncomingReferenceItem[];
+  relatedCjTeamMembers?: IncomingReferenceItem[];
 
   // Optional relations
-  people?: IncomingReferenceItem[];
   innovations?: IncomingReferenceItem[];
   relatedEvent?: IncomingReferenceItem;
   relatedEvents?: IncomingReferenceItem[];
@@ -224,10 +229,11 @@ export interface IncomingPostData {
   title: string;
   description?: string;
   slug: string;
-  status?: "published" | "draft";
+  status?: 'published' | 'draft';
 
   // Post specific fields
   arabicTitle?: string;
+  arabicCompleteIncomplete?: boolean;
   datePublished: string;
   location?: string;
   locationArabic?: string;
@@ -246,10 +252,18 @@ export interface IncomingPostData {
 
   // Media (required for posts)
   thumbnail: IncomingImageField;
+  heroImage: IncomingImageField;
   mainImage: IncomingImageField;
   openGraphImage: IncomingImageField;
 
+  // Image metadata
+  altTextHeroImageEnglish?: string;
+  altTextHeroImageArabic?: string;
+  photoCreditHeroImageEnglish?: string;
+  photoCreditHeroImageArabic?: string;
+
   // Video
+  videoAsHero?: boolean;
   heroVideoYoutubeId?: string;
   heroVideoArabicYoutubeId?: string;
 
@@ -270,8 +284,7 @@ export interface IncomingPostData {
   // Flags
   featured?: boolean;
   pushToGR?: boolean;
-  videoAsHero?: boolean;
-  arabicCompleteIncomplete?: boolean;
+  sitemapIndexing?: boolean;
 }
 
 // Incoming Source Data from Frontend Form
@@ -293,35 +306,41 @@ export interface IncomingSourceData {
 
 // Incoming Team Data from Frontend Form
 export interface IncomingTeamData {
-  title: string; // This will map to both title and data.name
+  title: string; // maps to name
   slug: string;
-  status?: "published" | "draft";
+  status?: 'published' | 'draft';
 
-  // Team member specific fields
-  name?: string; // Optional, will use title if not provided
+  // Personal information
+  name: string;
   nameArabic?: string;
   position?: string;
   positionArabic?: string;
-  paragraphDescription: string;
-  biographyArabic?: string;
-  metaDescription?: string;
-  metaDescriptionArabic?: string;
+
+  // Images
+  photo: IncomingImageField; // required
+  photoHires?: string; // URL
   altTextImage?: string;
   altTextImageArabic?: string;
+
+  // Biography
+  paragraphDescription: string; // required
+  biographyArabic?: string;
+
+  // Meta information
+  metaDescription?: string;
+  metaDescriptionArabic?: string;
+
+  // Categorization
   filter?:
-    | "Leadership"
-    | "Team"
-    | "Advisory Committee"
-    | "Alumnus"
-    | "COP27 Youth Delegate";
-  order: number;
+    | 'Leadership'
+    | 'Team'
+    | 'Advisory Committee'
+    | 'Alumnus'
+    | 'COP27 Youth Delegate';
+  order: number; // required
+
+  // Settings
   newsOnOff?: boolean;
-
-  // Media
-  photo: IncomingImageField; // Required
-  photoHires?: string; // URL
-
-  // Relations
   tags?: IncomingReferenceItem[];
 }
 

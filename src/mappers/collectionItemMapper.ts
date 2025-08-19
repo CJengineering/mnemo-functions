@@ -16,6 +16,12 @@ import {
   IncomingCollectionItem,
 } from "./incomingInterfaces";
 
+// Import ImageField type (need to check if it's exported or define it locally)
+type ImageField = {
+  url: string;
+  alt: string;
+};
+
 // Helper function to generate ID and timestamps
 function generateCollectionItemDefaults() {
   const now = new Date().toISOString();
@@ -98,11 +104,10 @@ export function mapIncomingEventToCollectionItem(
       video3EmbedCode: incoming.video3EmbedCode,
 
       // Dropdowns
-      group: incoming.group 
+      group: incoming.group,
     },
   };
 }
-
 
 // Programme Mapper
 export function mapIncomingProgrammeToCollectionItem(
@@ -113,41 +118,92 @@ export function mapIncomingProgrammeToCollectionItem(
   return {
     ...defaults,
     type: "programme",
-    status: incoming.status || "draft",
+    status: incoming.status ?? "draft",
     slug: incoming.slug,
     title: incoming.title,
     data: {
-      lab: incoming.lab,
-      pushToGR: incoming.pushToGR,
+      // Flags / order
+      lab: incoming.lab ?? false,
+      pushToGR: incoming.pushToGR ?? false,
+      order: incoming.order,
+
+      // Programme classification (avoid clashing with top-level "type")
+      type: incoming.type,
+
+      // Names
       nameArabic: incoming.nameArabic,
       shortNameEnglish: incoming.shortNameEnglish,
       shortNameArabic: incoming.shortNameArabic,
+
+      // Content
       missionEnglish: incoming.missionEnglish,
       missionArabic: incoming.missionArabic,
-      description: incoming.description,
       summaryEnglish: incoming.summaryEnglish,
       summaryArabic: incoming.summaryArabic,
+      summaryLongEnglish: incoming.summaryLongEnglish,
+      summaryLongArabic: incoming.summaryLongArabic,
+      oldMissionEnglish: incoming.oldMissionEnglish,
       researchEnglish: incoming.researchEnglish,
       researchArabic: incoming.researchArabic,
+      description: incoming.description,
+
+      // Details
       yearEstablished: incoming.yearEstablished,
       yearClosed: incoming.yearClosed,
-      headquartersArabic: incoming.headquartersArabic,
       headquartersEnglish: incoming.headquartersEnglish,
+      headquartersArabic: incoming.headquartersArabic,
+
+      // Media (logos)
       logoSvgDark: incoming.logoSvgDark,
       logoSvgLight: incoming.logoSvgLight,
+      logoSvgDarkOriginal: incoming.logoSvgDarkOriginal,
+      logoSvgLightOriginal: incoming.logoSvgLightOriginal,
+
+      // Media (hero / images)
       heroSquare: incoming.heroSquare,
       heroWide: incoming.heroWide,
-      openGraph: incoming.heroWide, // fallback to heroWide if not provided
-      partners: incoming.partners,
-      leadership: incoming.leadership,
-      relatedProgrammes: incoming.relatedProgrammes,
+      hero1x1: incoming.hero1x1,
+      hero16x9: incoming.hero16x9,
+      heroImage: incoming.heroImage,
+      thumbnail: incoming.thumbnail,
+      openGraph: incoming.openGraph || incoming.heroImage || incoming.heroWide, // ✅ correct fallback
+
+      // Video & links
+      mainVideo: incoming.mainVideo,
+      customLink: incoming.customLink,
+      buttonText: incoming.buttonText,
+
+      // Location
       longitude: incoming.longitude,
       latitude: incoming.latitude,
+
+      // External links
       website: incoming.website,
       linkedin: incoming.linkedin,
       instagram: incoming.instagram,
       twitter: incoming.twitter,
-      order: incoming.order,
+      youtube: incoming.youtube,
+      facebook: incoming.facebook,
+
+      // Relations
+      partners: incoming.partners ?? [],
+      leadership: incoming.leadership ?? [],
+      relatedProgrammes: incoming.relatedProgrammes ?? [],
+      features: incoming.features ?? [],
+
+      // Impact metrics
+      impact01: incoming.impact01,
+      impact01TitleArabic: incoming.impact01TitleArabic,
+      impact02: incoming.impact02,
+      impact02TitleArabic: incoming.impact02TitleArabic,
+      impact03: incoming.impact03,
+      impact03TitleArabic: incoming.impact03TitleArabic,
+      impact04: incoming.impact04,
+      impact04TitleArabic: incoming.impact04TitleArabic,
+      impact05: incoming.impact05,
+      impact05TitleArabic: incoming.impact05TitleArabic,
+      impact06: incoming.impact06,
+      impact06TitleArabic: incoming.impact06TitleArabic,
     },
   };
 }
@@ -158,32 +214,67 @@ export function mapIncomingNewsToCollectionItem(
 ): CollectionItemNews {
   const defaults = generateCollectionItemDefaults();
 
+  // Merge alt text if image.alt not provided
+  const thumbnail: ImageField | undefined = incoming.thumbnail
+    ? {
+        url: incoming.thumbnail.url,
+        alt: incoming.thumbnail.alt ?? incoming.imageAltTextEnglish ?? "",
+      }
+    : undefined;
+
+  const heroImage: ImageField | undefined = incoming.heroImage
+    ? {
+        url: incoming.heroImage.url,
+        alt: incoming.heroImage.alt ?? incoming.imageAltTextEnglish ?? "",
+      }
+    : undefined;
+
   return {
     ...defaults,
     type: "news",
-    status: incoming.status || "draft",
+    status: incoming.status ?? "draft",
     slug: incoming.slug,
     title: incoming.title,
     data: {
+      // titles / flags
       arabicTitle: incoming.arabicTitle,
-      pushToGR: incoming.pushToGR,
-      featured: incoming.featured,
+      pushToGR: incoming.pushToGR ?? false,
+      featured: incoming.featured ?? false,
+
+      // required meta
       externalLink: incoming.externalLink,
       datePublished: incoming.datePublished,
+
+      // relations (kept optional)
       sources: incoming.sources,
       programmeLabel: incoming.programmeLabel,
-      relatedProgrammes: incoming.relatedProgrammes,
-      people: incoming.people,
-      innovations: incoming.innovations,
+      relatedProgrammes: incoming.relatedProgrammes ?? [],
+
+      // people & misc relations
+      people: incoming.people ?? [],
+      relatedTeamMembers: incoming.relatedCjTeamMembers ?? [],
+      innovations: incoming.innovations ?? [],
       relatedEvent: incoming.relatedEvent,
-      relatedEvents: incoming.relatedEvents,
+      relatedEvents: incoming.relatedEvents ?? [],
+      tags: incoming.tags ?? [],
+
+      // content
       summary: incoming.summary,
       summaryArabic: incoming.summaryArabic,
       excerpt: incoming.excerpt,
-      thumbnail: incoming.thumbnail,
-      heroImage: incoming.heroImage,
-      tags: incoming.tags,
-      removeFromNewsGrid: incoming.removeFromNewsGrid,
+
+      // media
+      thumbnail,
+      heroImage,
+      imageAltTextEnglish: incoming.imageAltTextEnglish,
+      imageAltTextArabic: incoming.imageAltTextArabic,
+
+      // view flags
+      removeFromNewsGrid: incoming.removeFromNewsGrid ?? false,
+
+      // If your backend requires duplication inside data:
+      // title: incoming.title,
+      // slug: incoming.slug,
     },
   };
 }
@@ -194,44 +285,88 @@ export function mapIncomingPostToCollectionItem(
 ): CollectionItemPost {
   const defaults = generateCollectionItemDefaults();
 
+  // Helper to merge a provided ImageField with an alt fallback
+  const withAlt = (img?: ImageField, altFallback?: string): ImageField | undefined =>
+    img ? { url: img.url, alt: img.alt ?? altFallback ?? "" } : undefined;
+
+  // Prefer English alt text as a generic fallback (adjust if you want Arabic per locale)
+  const heroAltEn  = incoming.altTextHeroImageEnglish;
+  const heroAltAr  = incoming.altTextHeroImageArabic;
+
+  const thumbnail: ImageField | undefined = withAlt(incoming.thumbnail, heroAltEn);
+  const mainImage: ImageField | undefined = withAlt(incoming.mainImage, heroAltEn);
+
+  // Choose the best available Open Graph image (explicit → main → hero → thumb)
+  const openGraphImage: ImageField | undefined =
+    withAlt(incoming.openGraphImage, heroAltEn) ??
+    withAlt(incoming.mainImage,      heroAltEn) ??
+    withAlt(incoming.heroImage,      heroAltEn) ??
+    withAlt(incoming.thumbnail,      heroAltEn);
+
   return {
     ...defaults,
     type: "post",
-    status: incoming.status || "draft",
+    status: incoming.status ?? "draft",
     slug: incoming.slug,
     title: incoming.title,
     data: {
-      arabicCompleteIncomplete: incoming.arabicCompleteIncomplete,
-      arabicTitle: incoming.arabicTitle,
-      pushToGR: incoming.pushToGR,
+      // Flags
+      pushToGR: incoming.pushToGR ?? false,
+      featured: incoming.featured ?? false,
+      arabicCompleteIncomplete: incoming.arabicCompleteIncomplete ?? false,
+
+      // Relations
       programmeLabel: incoming.programmeLabel,
-      relatedProgrammes: incoming.relatedProgrammes,
+      relatedProgrammes: incoming.relatedProgrammes ?? [],
+      tags: incoming.tags ?? [],
+      blogCategory: incoming.blogCategory,
+      relatedEvent: incoming.relatedEvent,
+      people: incoming.people ?? [],
+      innovations: incoming.innovations ?? [],
+
+      // Content
+      arabicTitle: incoming.arabicTitle,
       bulletPointsEnglish: incoming.bulletPointsEnglish,
       bulletPointsArabic: incoming.bulletPointsArabic,
-      videoAsHero: incoming.videoAsHero,
+      bodyEnglish: incoming.bodyEnglish,
+      bodyArabic: incoming.bodyArabic,
+
+      // Video
+      videoAsHero: incoming.videoAsHero ?? false,
       heroVideoYoutubeId: incoming.heroVideoYoutubeId,
       heroVideoArabicYoutubeId: incoming.heroVideoArabicYoutubeId,
-      thumbnail: incoming.thumbnail,
-      mainImage: incoming.mainImage,
-      openGraphImage: incoming.openGraphImage,
+
+      // Images (required in CollectionItemPost)
+      thumbnail: thumbnail ?? { url: incoming.thumbnail?.url, alt: heroAltEn ?? "" },
+      mainImage: mainImage ?? { url: incoming.mainImage?.url, alt: heroAltEn ?? "" },
+      openGraphImage:
+        openGraphImage ??
+        { url: incoming.openGraphImage?.url ?? incoming.mainImage?.url ?? incoming.heroImage?.url ?? incoming.thumbnail?.url, alt: heroAltEn ?? "" },
+
+      // Image credits / alt fields (also kept separately)
+      altTextHeroImage: heroAltEn,
+      altTextHeroImageArabic: heroAltAr,
+      photoCreditHeroImage: incoming.photoCreditHeroImageEnglish,
+      photoCreditHeroImageArabic: incoming.photoCreditHeroImageArabic,
+
+      // Dates / place
       datePublished: incoming.datePublished,
       location: incoming.location,
       locationArabic: incoming.locationArabic,
+
+      // SEO
       seoTitle: incoming.seoTitle,
       seoTitleArabic: incoming.seoTitleArabic,
       seoMeta: incoming.seoMeta,
       seoMetaArabic: incoming.seoMetaArabic,
-      bodyEnglish: incoming.bodyEnglish,
-      bodyArabic: incoming.bodyArabic,
-      tags: incoming.tags,
-      blogCategory: incoming.blogCategory,
-      featured: incoming.featured,
-      imageCarousel: incoming.imageCarousel,
-      imageGalleryCreditsArabic: incoming.imageGalleryCreditsArabic,
+
+      // Gallery
+      imageCarousel: (incoming.imageCarousel as ImageField[] | undefined) ?? [],
       imageGalleryCredits: incoming.imageGalleryCredits,
-      relatedEvent: incoming.relatedEvent,
-      people: incoming.people,
-      innovations: incoming.innovations,
+      imageGalleryCreditsArabic: incoming.imageGalleryCreditsArabic,
+
+      // (Optional) if you later add this to the interface:
+      // sitemapIndexing: incoming.sitemapIndexing ?? true,
     },
   };
 }
@@ -264,29 +399,46 @@ export function mapIncomingTeamToCollectionItem(
 ): CollectionItemTeam {
   const defaults = generateCollectionItemDefaults();
 
+  // Ensure photo.alt is populated from altTextImage if missing
+  const photo: ImageField = {
+    url: incoming.photo?.url,
+    alt: incoming.photo?.alt ?? incoming.altTextImage ?? "",
+  };
+
   return {
     ...defaults,
     type: "team",
-    status: incoming.status || "draft",
+    status: incoming.status ?? "draft",
     slug: incoming.slug,
     title: incoming.title,
     data: {
-      name: incoming.name || incoming.title, // Use name if provided, otherwise use title
+      // Personal
+      name: incoming.name || incoming.title,
       nameArabic: incoming.nameArabic,
       position: incoming.position,
       positionArabic: incoming.positionArabic,
-      photo: incoming.photo,
+
+      // Images
+      photo,
       photoHires: incoming.photoHires,
-      paragraphDescription: incoming.paragraphDescription,
-      biographyArabic: incoming.biographyArabic,
-      metaDescription: incoming.metaDescription,
-      metaDescriptionArabic: incoming.metaDescriptionArabic,
       altTextImage: incoming.altTextImage,
       altTextImageArabic: incoming.altTextImageArabic,
+
+      // Bio
+      paragraphDescription: incoming.paragraphDescription,
+      biographyArabic: incoming.biographyArabic,
+
+      // Meta
+      metaDescription: incoming.metaDescription,
+      metaDescriptionArabic: incoming.metaDescriptionArabic,
+
+      // Categorization
       filter: incoming.filter,
       order: incoming.order,
-      newsOnOff: incoming.newsOnOff || false, // Default to false if not provided
-      tags: incoming.tags,
+
+      // Settings
+      newsOnOff: incoming.newsOnOff ?? false,
+      tags: incoming.tags ?? [],
     },
   };
 }
