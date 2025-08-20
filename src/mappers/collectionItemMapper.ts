@@ -5,6 +5,9 @@ import {
   CollectionItemPost,
   CollectionItemSource,
   CollectionItemTeam,
+  CollectionItemPartner,
+  CollectionItemPerson,
+  CollectionItemTag,
 } from "../../interface";
 import {
   IncomingEventData,
@@ -13,6 +16,9 @@ import {
   IncomingPostData,
   IncomingSourceData,
   IncomingTeamData,
+  IncomingPartnerData,
+  IncomingPersonData,
+  IncomingTagData,
   IncomingCollectionItem,
 } from "./incomingInterfaces";
 
@@ -286,22 +292,31 @@ export function mapIncomingPostToCollectionItem(
   const defaults = generateCollectionItemDefaults();
 
   // Helper to merge a provided ImageField with an alt fallback
-  const withAlt = (img?: ImageField, altFallback?: string): ImageField | undefined =>
+  const withAlt = (
+    img?: ImageField,
+    altFallback?: string
+  ): ImageField | undefined =>
     img ? { url: img.url, alt: img.alt ?? altFallback ?? "" } : undefined;
 
   // Prefer English alt text as a generic fallback (adjust if you want Arabic per locale)
-  const heroAltEn  = incoming.altTextHeroImageEnglish;
-  const heroAltAr  = incoming.altTextHeroImageArabic;
+  const heroAltEn = incoming.altTextHeroImageEnglish;
+  const heroAltAr = incoming.altTextHeroImageArabic;
 
-  const thumbnail: ImageField | undefined = withAlt(incoming.thumbnail, heroAltEn);
-  const mainImage: ImageField | undefined = withAlt(incoming.mainImage, heroAltEn);
+  const thumbnail: ImageField | undefined = withAlt(
+    incoming.thumbnail,
+    heroAltEn
+  );
+  const mainImage: ImageField | undefined = withAlt(
+    incoming.mainImage,
+    heroAltEn
+  );
 
   // Choose the best available Open Graph image (explicit → main → hero → thumb)
   const openGraphImage: ImageField | undefined =
     withAlt(incoming.openGraphImage, heroAltEn) ??
-    withAlt(incoming.mainImage,      heroAltEn) ??
-    withAlt(incoming.heroImage,      heroAltEn) ??
-    withAlt(incoming.thumbnail,      heroAltEn);
+    withAlt(incoming.mainImage, heroAltEn) ??
+    withAlt(incoming.heroImage, heroAltEn) ??
+    withAlt(incoming.thumbnail, heroAltEn);
 
   return {
     ...defaults,
@@ -337,11 +352,22 @@ export function mapIncomingPostToCollectionItem(
       heroVideoArabicYoutubeId: incoming.heroVideoArabicYoutubeId,
 
       // Images (required in CollectionItemPost)
-      thumbnail: thumbnail ?? { url: incoming.thumbnail?.url, alt: heroAltEn ?? "" },
-      mainImage: mainImage ?? { url: incoming.mainImage?.url, alt: heroAltEn ?? "" },
-      openGraphImage:
-        openGraphImage ??
-        { url: incoming.openGraphImage?.url ?? incoming.mainImage?.url ?? incoming.heroImage?.url ?? incoming.thumbnail?.url, alt: heroAltEn ?? "" },
+      thumbnail: thumbnail ?? {
+        url: incoming.thumbnail?.url,
+        alt: heroAltEn ?? "",
+      },
+      mainImage: mainImage ?? {
+        url: incoming.mainImage?.url,
+        alt: heroAltEn ?? "",
+      },
+      openGraphImage: openGraphImage ?? {
+        url:
+          incoming.openGraphImage?.url ??
+          incoming.mainImage?.url ??
+          incoming.heroImage?.url ??
+          incoming.thumbnail?.url,
+        alt: heroAltEn ?? "",
+      },
 
       // Image credits / alt fields (also kept separately)
       altTextHeroImage: heroAltEn,
@@ -443,6 +469,121 @@ export function mapIncomingTeamToCollectionItem(
   };
 }
 
+// Partner Mapper
+export function mapIncomingPartnerToCollectionItem(
+  incoming: IncomingPartnerData
+): CollectionItemPartner {
+  const defaults = generateCollectionItemDefaults();
+
+  return {
+    ...defaults,
+    type: "partner",
+    status: incoming.status ?? "draft",
+    slug: incoming.slug,
+    title: incoming.title,
+    data: {
+      // Core information
+      name: incoming.name || incoming.title, // Use name field, fallback to title
+      nameArabic: incoming["arabic-name"],
+
+      // Description
+      shortDescription: incoming["short-description"],
+      shortDescriptionArabic: incoming["short-description-arabic"],
+
+      // Links
+      website: incoming.website,
+
+      // Media
+      logo: incoming.logo,
+
+      // Categorization
+      group: incoming.group,
+
+      // Relations
+      tags: incoming.tags ?? [],
+    },
+  };
+}
+
+// Person Mapper
+export function mapIncomingPersonToCollectionItem(
+  incoming: IncomingPersonData
+): CollectionItemPerson {
+  const defaults = generateCollectionItemDefaults();
+
+  return {
+    ...defaults,
+    type: "person",
+    status: incoming.status ?? "draft",
+    slug: incoming.slug,
+    title: incoming.title,
+    data: {
+      name: incoming.name || incoming.title, // Required - fallback to title
+      nameArabic: incoming["name-arabic"],
+      arabicOnOff: incoming["arabic-on-off"],
+      pushToGR: incoming["push-to-gr"],
+      hero: incoming.hero,
+      relatedProgramme: incoming["related-programme"],
+      relatedProgrammes: incoming["related-programmes"] ?? [],
+      color: incoming.color,
+      role: incoming.role,
+      roleArabic: incoming["role-arabic"],
+      shortDescription: incoming["short-description"],
+      shortDescriptionArabic: incoming["short-description-arabic"],
+      biography: incoming.biography,
+      biographyArabic: incoming["biography-arabic"],
+      events: incoming.events,
+      eventsArabic: incoming["events-arabic"],
+      researchAreaEnglish: incoming["research-area-english"],
+      researchAreasArabic: incoming["research-areas-arabic"],
+      type: incoming.type,
+      heroImage: incoming["hero-image"],
+      profilePicture: incoming["profile-picture"],
+      featureVideo: incoming["feature-video"],
+      relatedPeople: incoming["related-people-s"] ?? [],
+      partnerOrganisation: incoming["partner-organisation"] ?? [],
+      instagramLink: incoming["instagram-link"],
+      linkedinLink: incoming["linkedin-link"],
+      twitterLink: incoming["twitter-link"],
+      facebook: incoming.facebook,
+      youtubeLink: incoming["youtube-link"],
+      github: incoming.github,
+      websiteLink: incoming["website-link"],
+      shop: incoming.shop,
+      photos: incoming.photos ?? [],
+      hideNews: incoming["hide-news"],
+      hideMultimedia: incoming["hide-multimedia"],
+      hideEvents: incoming["hide-events"],
+      hidePublications: incoming["hide-publications"],
+      hidePhotos: incoming["hide-photos"],
+      hideEventsRichText: incoming["hide-events-rich-text"],
+      multimedia: incoming.multimedia ?? [],
+      tag: incoming.tag ?? [],
+      order: incoming.order,
+      country: incoming.country,
+    },
+  };
+}
+
+// Tag Mapper
+export function mapIncomingTagToCollectionItem(
+  incoming: IncomingTagData
+): CollectionItemTag {
+  const defaults = generateCollectionItemDefaults();
+
+  return {
+    ...defaults,
+    type: "tag",
+    status: incoming.status ?? "draft",
+    slug: incoming.slug,
+    title: incoming.name || incoming.title, // Use name as title, fallback to title
+    data: {
+      name: incoming.name || incoming.title, // Required - fallback to title if name is missing
+      nameArabic: incoming["name-arabic"],
+    },
+  };
+}
+
 // Main mapper function that handles all types
 export function mapIncomingCollectionItem(
   incoming: IncomingCollectionItem
@@ -452,7 +593,10 @@ export function mapIncomingCollectionItem(
   | CollectionItemNews
   | CollectionItemPost
   | CollectionItemSource
-  | CollectionItemTeam {
+  | CollectionItemTeam
+  | CollectionItemPartner
+  | CollectionItemPerson
+  | CollectionItemTag {
   switch (incoming.type) {
     case "event":
       return mapIncomingEventToCollectionItem(
@@ -472,6 +616,16 @@ export function mapIncomingCollectionItem(
       );
     case "team":
       return mapIncomingTeamToCollectionItem(incoming.data as IncomingTeamData);
+    case "partner":
+      return mapIncomingPartnerToCollectionItem(
+        incoming.data as IncomingPartnerData
+      );
+    case "person":
+      return mapIncomingPersonToCollectionItem(
+        incoming.data as IncomingPersonData
+      );
+    case "tag":
+      return mapIncomingTagToCollectionItem(incoming.data as IncomingTagData);
     default:
       throw new Error(
         `Unknown collection item type: ${(incoming as any).type}`

@@ -308,7 +308,7 @@ export interface CollectionItemSource {
   type: "source";
   status: "published" | "draft";
   slug: string;
-  title: string; // maps from "name"
+  title: string; // maps from "name" field
   created_at: string;
   updated_at: string;
 
@@ -319,6 +319,38 @@ export interface CollectionItemSource {
 
     logo?: ImageField;
     logoNative?: ImageField;
+  };
+}
+
+export interface CollectionItemPartner {
+  id: string;
+  type: "partner";
+  status: "published" | "draft";
+  slug: string;
+  title: string; // maps from "name" field
+  created_at: string;
+  updated_at: string;
+
+  data: {
+    // Core information
+    name: string; // From "name" field - required
+    nameArabic?: string; // From "arabic-name" field
+
+    // Description
+    shortDescription?: string; // From "short-description" field
+    shortDescriptionArabic?: string; // From "short-description-arabic" field
+
+    // Links
+    website?: string; // From "website" field
+
+    // Media
+    logo?: ImageField; // From "logo" field
+
+    // Categorization
+    group?: string; // From "group" field - currently supports "COP27"
+
+    // Relations
+    tags?: ReferenceItem[]; // From "tags" field
   };
 }
 export interface CollectionItemPost {
@@ -388,5 +420,73 @@ export interface CollectionItemPost {
     imageCarousel?: ImageField[];
     imageGalleryCredits?: string;
     imageGalleryCreditsArabic?: string;
+  };
+}
+
+export interface CollectionItemPerson {
+  id: string;
+  type: "person";
+  status: "published" | "draft";
+  slug: string;
+  title: string; // maps from "name" field
+  created_at: string;
+  updated_at: string;
+  data: {
+    name: string; // required - English name
+    nameArabic?: string;
+    arabicOnOff?: boolean;
+    pushToGR?: boolean;
+    hero?: boolean;
+    relatedProgramme?: ReferenceItem; // Programme label
+    relatedProgrammes?: ReferenceItem[];
+    color?: string;
+    role?: string; // Role (English)
+    roleArabic?: string;
+    shortDescription?: string; // Short description (English)
+    shortDescriptionArabic?: string;
+    biography?: string; // Biography (English) - RichText
+    biographyArabic?: string; // Biography (Arabic) - RichText
+    events?: string; // Events (English) - RichText
+    eventsArabic?: string; // Events (Arabic) - RichText
+    researchAreaEnglish?: string; // Research area (English) - RichText
+    researchAreasArabic?: string; // Research areas (Arabic) - RichText
+    type?: string; // Professor, Doctor, Economist, etc.
+    heroImage?: ImageField;
+    profilePicture?: ImageField;
+    featureVideo?: string; // YouTube video ID
+    relatedPeople?: ReferenceItem[];
+    partnerOrganisation?: ReferenceItem[];
+    instagramLink?: string;
+    linkedinLink?: string;
+    twitterLink?: string;
+    facebook?: string;
+    youtubeLink?: string;
+    github?: string;
+    websiteLink?: string;
+    shop?: string;
+    photos?: ImageField[]; // MultiImage
+    hideNews?: boolean;
+    hideMultimedia?: boolean;
+    hideEvents?: boolean;
+    hidePublications?: boolean;
+    hidePhotos?: boolean;
+    hideEventsRichText?: boolean;
+    multimedia?: ReferenceItem[];
+    tag?: ReferenceItem[]; // Tags
+    order?: number;
+    country?: string;
+  };
+}
+export interface CollectionItemTag {
+  id: string;
+  type: "tag";
+  status: "published" | "draft";
+  slug: string;
+  title: string; // maps from "name" field
+  created_at: string;
+  updated_at: string;
+  data: {
+    name: string; // required - English name
+    nameArabic?: string; // optional - Arabic name
   };
 }

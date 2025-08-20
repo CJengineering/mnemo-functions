@@ -13,7 +13,17 @@ const openai = process.env.OPENAI_API_KEY
 const AISuccessResponseSchema = z.object({
   status: z.literal("ok"),
   data: z.object({
-    type: z.enum(["event", "post", "programme", "news", "source", "team"]),
+    type: z.enum([
+      "event",
+      "post",
+      "programme",
+      "news",
+      "source",
+      "team",
+      "partner",
+      "person",
+      "tag",
+    ]),
     data: z.record(z.any()), // Will be validated more specifically later
   }),
 });
@@ -328,11 +338,181 @@ If missing required fields, respond with:
 }
 
 IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
+
+  partner: `You are an AI assistant that converts natural language descriptions into structured partner organization data.
+
+REQUIRED FIELDS for partners:
+- title: string (organization name - maps to "name" field)
+- slug: string (URL-friendly, lowercase, hyphens)
+- name: string (organization's official name)
+- status: "published" | "draft"
+
+OPTIONAL FIELDS:
+- arabic-name: string (organization name in Arabic)
+- short-description: string (brief description of the organization)
+- short-description-arabic: string (brief description in Arabic)
+- website: string (organization's website URL)
+- logo: object with url and alt text
+- group: string (currently supports "COP27" as an option)
+- tags: array of objects with id and slug
+
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "partner",
+    "data": { 
+      "title": "Tech Solutions Inc",
+      "slug": "tech-solutions-inc",
+      "name": "Tech Solutions Inc",
+      "status": "published",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for partner creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
+
+  person: `You are an AI assistant that converts natural language descriptions into structured person data.
+
+REQUIRED FIELDS for people:
+- title: string (person's display name - used as the page title)
+- slug: string (URL-friendly, lowercase, hyphens)
+- name: string (person's official name)
+- status: "published" | "draft"
+
+OPTIONAL FIELDS:
+- name-arabic: string (person's name in Arabic)
+- arabic-on-off: boolean (whether Arabic content is enabled)
+- push-to-gr: boolean (whether to push to GR system)
+- hero: boolean (whether this is a hero/featured person)
+- related-programme: object with id and slug (primary programme association)
+- related-programmes: array of objects with id and slug (all programme associations)
+- color: string (hex color code for theming)
+- role: string (person's role/position in English)
+- role-arabic: string (person's role/position in Arabic)
+- short-description: string (brief description in English, e.g., "President, American University in Cairo")
+- short-description-arabic: string (brief description in Arabic)
+- biography: string (full biography in English - rich text)
+- biography-arabic: string (full biography in Arabic - rich text)
+- events: string (events information in English - rich text)
+- events-arabic: string (events information in Arabic - rich text)
+- research-area-english: string (research areas in English - rich text)
+- research-areas-arabic: string (research areas in Arabic - rich text)
+- type: string (one of: "Professor", "Doctor", "Economist", "Researcher", "Engineer", "Diplomat", "Government official", "Organisational leadership", "Art curator", "Artist", "Musician", "Filmmaker", "Photographer")
+- hero-image: object with url and alt text
+- profile-picture: object with url and alt text
+- feature-video: string (YouTube video ID)
+- related-people-s: array of objects with id and slug (related people)
+- partner-organisation: array of objects with id and slug (partner organizations)
+- instagram-link: string (Instagram profile URL)
+- linkedin-link: string (LinkedIn profile URL) 
+- twitter-link: string (Twitter profile URL)
+- facebook: string (Facebook profile URL)
+- youtube-link: string (YouTube channel URL)
+- github: string (GitHub profile URL)
+- website-link: string (personal/professional website URL)
+- shop: string (online shop URL for artists/entrepreneurs)
+- photos: array of objects with url and alt text (photo gallery)
+- hide-news: boolean (hide news section)
+- hide-multimedia: boolean (hide multimedia section)
+- hide-events: boolean (hide events section)
+- hide-publications: boolean (hide publications section)
+- hide-photos: boolean (hide photos section)
+- hide-events-rich-text: boolean (hide events rich text section)
+- multimedia: array of objects with id and slug (multimedia references)
+- tag: array of objects with id and slug (tags)
+- order: number (display order)
+- country: string (person's country)
+
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "person",
+    "data": { 
+      "title": "Dr. Sarah Johnson",
+      "slug": "dr-sarah-johnson",
+      "name": "Sarah Johnson",
+      "status": "published",
+      "role": "Chief Research Scientist",
+      "short-description": "Leading AI researcher and climate tech expert",
+      "type": "Researcher",
+      // ... any optional fields you can extract
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for person creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
+
+  tag: `You are an AI assistant that converts natural language descriptions into structured tag data.
+
+REQUIRED FIELDS for tags:
+- title: string (tag display name - used as the page title)
+- slug: string (URL-friendly, lowercase, hyphens)
+- name: string (tag name, typically same as title)
+- status: "published" | "draft"
+
+OPTIONAL FIELDS:
+- name-arabic: string (tag name in Arabic)
+
+RESPONSE FORMAT:
+If you can extract all REQUIRED fields, respond with:
+{
+  "status": "ok",
+  "data": {
+    "type": "tag",
+    "data": { 
+      "title": "Machine Learning",
+      "slug": "machine-learning",
+      "name": "Machine Learning",
+      "status": "published",
+      "name-arabic": "التعلم الآلي"
+    }
+  }
+}
+
+If missing required fields, respond with:
+{
+  "status": "error", 
+  "message": "Missing required information for tag creation",
+  "missing": ["field1", "field2"],
+  "partial_data": { /* any fields you could extract */ }
+}
+
+IMPORTANT: Always generate a slug from the title (lowercase, replace spaces with hyphens, remove special characters).`,
 };
 
 export interface PromptToItemRequest {
   prompt: string;
-  type?: "event" | "post" | "programme" | "news" | "source" | "team";
+  type?:
+    | "event"
+    | "post"
+    | "programme"
+    | "news"
+    | "source"
+    | "team"
+    | "partner"
+    | "person"
+    | "tag";
   context?: string; // Additional context from user
 }
 
@@ -537,23 +717,69 @@ async function inferCollectionType(
     return "source";
   }
   if (
+    lowerPrompt.includes("person") ||
+    lowerPrompt.includes("individual") ||
+    lowerPrompt.includes("researcher") ||
+    lowerPrompt.includes("professor") ||
+    lowerPrompt.includes("doctor") ||
+    lowerPrompt.includes("dr.") ||
+    lowerPrompt.includes("economist") ||
+    lowerPrompt.includes("engineer") ||
+    lowerPrompt.includes("diplomat") ||
+    lowerPrompt.includes("artist") ||
+    lowerPrompt.includes("musician") ||
+    lowerPrompt.includes("filmmaker") ||
+    lowerPrompt.includes("photographer") ||
+    lowerPrompt.includes("curator") ||
+    lowerPrompt.includes("biography") ||
+    lowerPrompt.includes("bio") ||
+    lowerPrompt.includes("profile") ||
+    lowerPrompt.includes("cv") ||
+    lowerPrompt.includes("resume")
+  ) {
+    return "person";
+  }
+  if (
     lowerPrompt.includes("team") ||
     lowerPrompt.includes("staff") ||
     lowerPrompt.includes("member") ||
-    lowerPrompt.includes("person") ||
     lowerPrompt.includes("employee") ||
-    lowerPrompt.includes("researcher") ||
     lowerPrompt.includes("director") ||
     lowerPrompt.includes("manager") ||
     lowerPrompt.includes("leader") ||
-    lowerPrompt.includes("professor") ||
-    lowerPrompt.includes("dr.") ||
     lowerPrompt.includes("ceo") ||
-    lowerPrompt.includes("cto") ||
-    lowerPrompt.includes("biography") ||
-    lowerPrompt.includes("bio")
+    lowerPrompt.includes("cto")
   ) {
     return "team";
+  }
+  if (
+    lowerPrompt.includes("partner") ||
+    lowerPrompt.includes("organization") ||
+    lowerPrompt.includes("company") ||
+    lowerPrompt.includes("institution") ||
+    lowerPrompt.includes("foundation") ||
+    lowerPrompt.includes("corp") ||
+    lowerPrompt.includes("ltd") ||
+    lowerPrompt.includes("inc") ||
+    lowerPrompt.includes("collaboration") ||
+    lowerPrompt.includes("sponsor") ||
+    lowerPrompt.includes("supporter")
+  ) {
+    return "partner";
+  }
+  if (
+    lowerPrompt.includes("tag") ||
+    lowerPrompt.includes("label") ||
+    lowerPrompt.includes("category") ||
+    lowerPrompt.includes("topic") ||
+    lowerPrompt.includes("taxonomy") ||
+    lowerPrompt.includes("keyword") ||
+    lowerPrompt.includes("classification") ||
+    lowerPrompt.includes("tagging") ||
+    lowerPrompt.includes("categorize") ||
+    lowerPrompt.includes("classify")
+  ) {
+    return "tag";
   }
 
   // Default to event if unclear

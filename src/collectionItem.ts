@@ -40,6 +40,8 @@ export async function createCollectionItem(req: Request, res: Response) {
       "publication",
       "prize",
       "partner",
+      "person",
+      "tag",
     ];
     const validStatuses = ["draft", "published"]; // Fixed to match database schema
 
@@ -186,6 +188,8 @@ export async function updateCollectionItem(req: Request, res: Response) {
       "publication",
       "prize",
       "partner",
+      "person",
+      "tag",
     ];
     const validStatuses = ["draft", "published"]; // Fixed to match database schema
 
@@ -327,6 +331,8 @@ export async function getCollectionItemsByType(req: Request, res: Response) {
       "publication",
       "prize",
       "partner",
+      "person",
+      "tag",
     ];
 
     if (!validTypes.includes(type)) {
@@ -490,6 +496,8 @@ export async function updateCollectionItemBySlug(req: Request, res: Response) {
       "publication",
       "prize",
       "partner",
+      "person",
+      "tag",
     ];
     const validStatuses = ["draft", "published"];
 

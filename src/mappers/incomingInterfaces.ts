@@ -17,7 +17,7 @@ export interface IncomingEventData {
   title: string;
   description?: string;
   slug: string;
-  status?: 'published' | 'draft';
+  status?: "published" | "draft";
 
   // Event specific fields
   arabicTitle?: string;
@@ -185,7 +185,7 @@ export interface IncomingNewsData {
   title: string;
   description?: string;
   slug: string;
-  status?: 'published' | 'draft';
+  status?: "published" | "draft";
 
   // News specific fields
   arabicTitle?: string;
@@ -229,7 +229,7 @@ export interface IncomingPostData {
   title: string;
   description?: string;
   slug: string;
-  status?: 'published' | 'draft';
+  status?: "published" | "draft";
 
   // Post specific fields
   arabicTitle?: string;
@@ -308,7 +308,7 @@ export interface IncomingSourceData {
 export interface IncomingTeamData {
   title: string; // maps to name
   slug: string;
-  status?: 'published' | 'draft';
+  status?: "published" | "draft";
 
   // Personal information
   name: string;
@@ -332,16 +332,138 @@ export interface IncomingTeamData {
 
   // Categorization
   filter?:
-    | 'Leadership'
-    | 'Team'
-    | 'Advisory Committee'
-    | 'Alumnus'
-    | 'COP27 Youth Delegate';
+    | "Leadership"
+    | "Team"
+    | "Advisory Committee"
+    | "Alumnus"
+    | "COP27 Youth Delegate";
   order: number; // required
 
   // Settings
   newsOnOff?: boolean;
   tags?: IncomingReferenceItem[];
+}
+
+// Incoming Partner Data from Frontend Form
+export interface IncomingPartnerData {
+  title: string; // maps to name - this will be used as title
+  slug: string; // required
+  status?: "published" | "draft";
+
+  // Core information (matching JSON field names)
+  name: string; // Required - from "name" field
+  "arabic-name"?: string; // Optional - from "arabic-name" field
+
+  // Description
+  "short-description"?: string; // Optional - from "short-description" field
+  "short-description-arabic"?: string; // Optional - from "short-description-arabic" field
+
+  // Links
+  website?: string; // Optional - from "website" field
+
+  // Media
+  logo?: IncomingImageField; // Optional - from "logo" field
+
+  // Categorization
+  group?: string; // Optional - from "group" field, currently supports "COP27"
+
+  // Relations
+  tags?: IncomingReferenceItem[]; // Optional - from "tags" field
+}
+
+// Incoming Person Data from Frontend Form
+export interface IncomingPersonData {
+  title: string;
+  slug: string;
+  status?: "published" | "draft";
+
+  // Core information (matching JSON field names)
+  name: string; // Required - from "name" field
+  "name-arabic"?: string; // Optional - from "name-arabic" field
+  "arabic-on-off"?: boolean; // Optional - from "arabic-on-off" field
+  "push-to-gr"?: boolean; // Optional - from "push-to-gr" field
+  hero?: boolean; // Optional - from "hero" field
+
+  // Programme relations
+  "related-programme"?: IncomingReferenceItem; // Optional - from "related-programme" field
+  "related-programmes"?: IncomingReferenceItem[]; // Optional - from "related-programmes" field
+
+  // Appearance
+  color?: string; // Optional - from "color" field
+
+  // Role information
+  role?: string; // Optional - from "role" field (English)
+  "role-arabic"?: string; // Optional - from "role-arabic" field
+
+  // Descriptions
+  "short-description"?: string; // Optional - from "short-description" field (English)
+  "short-description-arabic"?: string; // Optional - from "short-description-arabic" field
+
+  // Biographies (RichText)
+  biography?: string; // Optional - from "biography" field (English)
+  "biography-arabic"?: string; // Optional - from "biography-arabic" field
+
+  // Events (RichText)
+  events?: string; // Optional - from "events" field (English)
+  "events-arabic"?: string; // Optional - from "events-arabic" field
+
+  // Research areas (RichText)
+  "research-area-english"?: string; // Optional - from "research-area-english" field
+  "research-areas-arabic"?: string; // Optional - from "research-areas-arabic" field
+
+  // Type classification
+  type?: string; // Optional - from "type" field (Professor, Doctor, etc.)
+
+  // Images
+  "hero-image"?: IncomingImageField; // Optional - from "hero-image" field
+  "profile-picture"?: IncomingImageField; // Optional - from "profile-picture" field
+
+  // Video
+  "feature-video"?: string; // Optional - from "feature-video" field (YouTube ID)
+
+  // Relations
+  "related-people-s"?: IncomingReferenceItem[]; // Optional - from "related-people-s" field
+  "partner-organisation"?: IncomingReferenceItem[]; // Optional - from "partner-organisation" field
+
+  // Social links
+  "instagram-link"?: string; // Optional - from "instagram-link" field
+  "linkedin-link"?: string; // Optional - from "linkedin-link" field
+  "twitter-link"?: string; // Optional - from "twitter-link" field
+  facebook?: string; // Optional - from "facebook" field
+  "youtube-link"?: string; // Optional - from "youtube-link" field
+  github?: string; // Optional - from "github" field
+  "website-link"?: string; // Optional - from "website-link" field
+  shop?: string; // Optional - from "shop" field
+
+  // Gallery
+  photos?: IncomingImageField[]; // Optional - from "photos" field (MultiImage)
+
+  // Visibility toggles
+  "hide-news"?: boolean; // Optional - from "hide-news" field
+  "hide-multimedia"?: boolean; // Optional - from "hide-multimedia" field
+  "hide-events"?: boolean; // Optional - from "hide-events" field
+  "hide-publications"?: boolean; // Optional - from "hide-publications" field
+  "hide-photos"?: boolean; // Optional - from "hide-photos" field
+  "hide-events-rich-text"?: boolean; // Optional - from "hide-events-rich-text" field
+
+  // Additional relations
+  multimedia?: IncomingReferenceItem[]; // Optional - from "multimedia" field
+  tag?: IncomingReferenceItem[]; // Optional - from "tag" field (Tags)
+
+  // Ordering and location
+  order?: number; // Optional - from "order" field
+  country?: string; // Optional - from "country" field
+}
+
+// Incoming Tag Data from Frontend Form
+export interface IncomingTagData {
+  title: string; // maps to name - this will be used as title
+  slug: string; // required
+  status?: "published" | "draft";
+
+  // Core information (matching JSON field names)
+  name: string; // Required - from "name" field
+  "name-arabic"?: string; // Optional - from "name-arabic" field
 }
 
 // Union type for all incoming data types
@@ -351,10 +473,22 @@ export type IncomingCollectionItemData =
   | IncomingNewsData
   | IncomingPostData
   | IncomingSourceData
-  | IncomingTeamData;
+  | IncomingTeamData
+  | IncomingPartnerData
+  | IncomingPersonData
+  | IncomingTagData;
 
 // Type discriminator for the frontend to specify which type they're sending
 export interface IncomingCollectionItem {
-  type: "event" | "programme" | "news" | "post" | "source" | "team";
+  type:
+    | "event"
+    | "programme"
+    | "news"
+    | "post"
+    | "source"
+    | "team"
+    | "partner"
+    | "person"
+    | "tag";
   data: IncomingCollectionItemData;
 }
