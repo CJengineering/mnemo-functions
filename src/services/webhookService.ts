@@ -47,11 +47,6 @@ export async function sendWebhook(
   const payload: WebhookPayload = {
     action,
     collectionItem,
-    metadata: {
-      timestamp: new Date().toISOString(),
-      source: "mnemosyne-functions",
-      ...(changes && { changes }),
-    },
   };
 
   console.log(`📤 Sending ${action} webhook to: ${endpoint}`);
