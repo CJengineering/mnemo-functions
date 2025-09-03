@@ -1,7 +1,8 @@
 // Test webhook integration with collection items - CORRECTED VERSION
 // This script tests the webhook functionality using the direct API endpoint
 
-const API_URL = "https://mnemo-app-e4f6j5kdsq-ew.a.run.app/api/collection-items";
+const API_URL =
+  "https://mnemo-app-e4f6j5kdsq-ew.a.run.app/api/collection-items";
 
 async function testWebhookIntegration() {
   console.log("🧪 Testing Webhook Integration - CORRECTED");
@@ -9,7 +10,7 @@ async function testWebhookIntegration() {
 
   // Test 1: Create a new collection item (should trigger CREATE webhook)
   console.log("\n📝 Test 1: Creating new collection item...");
-  
+
   // Using the DIRECT API format (not the form mapper format)
   const createPayload = {
     type: "tag",
@@ -20,24 +21,24 @@ async function testWebhookIntegration() {
 
   try {
     const createResponse = await fetch(API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(createPayload)
+      body: JSON.stringify(createPayload),
     });
 
     const createResult = await createResponse.json();
-    
+
     if (createResult.success) {
       console.log("✅ Create test successful:", {
         id: createResult.collectionItem.id,
         slug: createResult.collectionItem.slug,
-        title: createResult.collectionItem.title
+        title: createResult.collectionItem.title,
       });
-      
+
       const itemId = createResult.collectionItem.id;
-      
+
       // Test 2: Update the collection item (should trigger UPDATE webhook)
       console.log("\n🔄 Test 2: Updating collection item...");
       const updatePayload = {
@@ -45,32 +46,31 @@ async function testWebhookIntegration() {
         status: "published",
         data: {
           name: "Updated Webhook Test Tag",
-          nameArabic: "تجربة الويب هوك المحدثة"
-        }
+          nameArabic: "تجربة الويب هوك المحدثة",
+        },
       };
 
       const updateResponse = await fetch(`${API_URL}/${itemId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatePayload)
+        body: JSON.stringify(updatePayload),
       });
 
       const updateResult = await updateResponse.json();
-      
+
       if (updateResult.success) {
         console.log("✅ Update test successful:", {
           id: updateResult.collectionItem.id,
           slug: updateResult.collectionItem.slug,
           title: updateResult.collectionItem.title,
-          status: updateResult.collectionItem.status
+          status: updateResult.collectionItem.status,
         });
-        
+
         console.log("📊 Webhook calls should have been made:");
         console.log("  1. CREATE webhook when item was created");
         console.log("  2. UPDATE webhook when item was updated");
-        
       } else {
         console.error("❌ Update test failed:", updateResult);
       }
@@ -78,18 +78,19 @@ async function testWebhookIntegration() {
       // Clean up: Delete the test item
       console.log("\n🗑️ Cleaning up test data...");
       const deleteResponse = await fetch(`${API_URL}/${itemId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
       if (deleteResponse.ok) {
         console.log("✅ Test data cleaned up successfully");
       }
-
     } else {
       console.error("❌ Create test failed:", createResult);
-      console.log("📝 Request payload was:", JSON.stringify(createPayload, null, 2));
+      console.log(
+        "📝 Request payload was:",
+        JSON.stringify(createPayload, null, 2)
+      );
     }
-
   } catch (error) {
     console.error("❌ Test error:", error.message);
   }
@@ -107,44 +108,42 @@ async function testWebhookIntegration() {
 async function testWebhookWithTagUpload() {
   console.log("\n🏷️ Alternative Test: Using Tag Upload Approach");
   console.log("-".repeat(50));
-  
+
   // This matches the working tag upload script format
   const tagPayload = {
     type: "tag",
     title: "Webhook Tag Test",
-    name: "Webhook Tag Test", 
+    name: "Webhook Tag Test",
     slug: "webhook-tag-test",
     status: "published",
-    "name-arabic": "اختبار التاغ"
+    "name-arabic": "اختبار التاغ",
   };
 
   try {
     const response = await fetch(API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(tagPayload)
+      body: JSON.stringify(tagPayload),
     });
 
     const result = await response.json();
-    
+
     if (result.success) {
       console.log("✅ Tag upload style test successful:", {
         id: result.collectionItem.id,
         slug: result.collectionItem.slug,
-        title: result.collectionItem.title
+        title: result.collectionItem.title,
       });
-      
+
       // Clean up
       await fetch(`${API_URL}/${result.collectionItem.id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
-      
     } else {
       console.error("❌ Tag upload style test failed:", result);
     }
-    
   } catch (error) {
     console.error("❌ Tag upload test error:", error.message);
   }

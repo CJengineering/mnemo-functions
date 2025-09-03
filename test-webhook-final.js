@@ -1,7 +1,8 @@
 // Test webhook integration - Using WORKING Python script format
 // This matches the exact format that successfully uploaded tags
 
-const API_URL = "https://mnemo-app-e4f6j5kdsq-ew.a.run.app/api/collection-items";
+const API_URL =
+  "https://mnemo-app-e4f6j5kdsq-ew.a.run.app/api/collection-items";
 
 async function testWebhookWithWorkingFormat() {
   console.log("🧪 Testing Webhook Integration - Using WORKING Format");
@@ -9,46 +10,46 @@ async function testWebhookWithWorkingFormat() {
 
   // Test 1: Create using the EXACT format that worked in Python
   console.log("\n📝 Test 1: Creating new collection item...");
-  
+
   const createPayload = {
     type: "tag",
     status: "draft",
     slug: "webhook-test-tag",
     title: "Webhook Test Tag",
     data: {
-      name: "Webhook Test Tag"  // This matches the working Python format
-    }
+      name: "Webhook Test Tag", // This matches the working Python format
+    },
   };
 
   try {
     console.log("📤 Sending payload:", JSON.stringify(createPayload, null, 2));
-    
+
     const createResponse = await fetch(API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(createPayload)
+      body: JSON.stringify(createPayload),
     });
 
     const createResult = await createResponse.json();
-    
+
     if (createResult.success) {
       console.log("✅ Create test successful:", {
         id: createResult.collectionItem.id,
         slug: createResult.collectionItem.slug,
         title: createResult.collectionItem.title,
-        type: createResult.collectionItem.type
+        type: createResult.collectionItem.type,
       });
-      
+
       console.log("🎉 CREATE WEBHOOK should have been triggered!");
       console.log("   Check logs for: '📤 Sending create webhook to:'");
-      
+
       const itemId = createResult.collectionItem.id;
-      
+
       // Wait a moment
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Test 2: Update the collection item (should trigger UPDATE webhook)
       console.log("\n🔄 Test 2: Updating collection item...");
       const updatePayload = {
@@ -56,45 +57,47 @@ async function testWebhookWithWorkingFormat() {
         status: "published",
         data: {
           name: "UPDATED Webhook Test Tag",
-          nameArabic: "تجربة الويب هوك المحدثة"
-        }
+          nameArabic: "تجربة الويب هوك المحدثة",
+        },
       };
 
-      console.log("📤 Sending update payload:", JSON.stringify(updatePayload, null, 2));
+      console.log(
+        "📤 Sending update payload:",
+        JSON.stringify(updatePayload, null, 2)
+      );
 
       const updateResponse = await fetch(`${API_URL}/${itemId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatePayload)
+        body: JSON.stringify(updatePayload),
       });
 
       const updateResult = await updateResponse.json();
-      
+
       if (updateResult.success) {
         console.log("✅ Update test successful:", {
           id: updateResult.collectionItem.id,
           slug: updateResult.collectionItem.slug,
           title: updateResult.collectionItem.title,
-          status: updateResult.collectionItem.status
+          status: updateResult.collectionItem.status,
         });
-        
+
         console.log("🎉 UPDATE WEBHOOK should have been triggered!");
         console.log("   Check logs for: '📤 Sending update webhook to:'");
         console.log("   Changed fields: ['title', 'status', 'data']");
-        
       } else {
         console.error("❌ Update test failed:", updateResult);
       }
 
       // Wait before cleanup
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Clean up: Delete the test item
       console.log("\n🗑️ Cleaning up test data...");
       const deleteResponse = await fetch(`${API_URL}/${itemId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
       if (deleteResponse.ok) {
@@ -102,12 +105,13 @@ async function testWebhookWithWorkingFormat() {
       } else {
         console.warn("⚠️ Cleanup may have failed - check manually");
       }
-
     } else {
       console.error("❌ Create test failed:", createResult);
-      console.log("📋 Full error response:", JSON.stringify(createResult, null, 2));
+      console.log(
+        "📋 Full error response:",
+        JSON.stringify(createResult, null, 2)
+      );
     }
-
   } catch (error) {
     console.error("❌ Test error:", error.message);
     console.error("Stack:", error.stack);
@@ -118,24 +122,27 @@ async function testWebhookWithWorkingFormat() {
 async function testWebhookEnvironment() {
   console.log("\n🔧 Environment Configuration Test");
   console.log("-".repeat(40));
-  
+
   // Check if webhooks are enabled
   const nodeEnv = process.env.NODE_ENV;
   const webhooksEnabled = process.env.WEBHOOKS_ENABLED;
-  
+
   console.log("Environment variables:");
-  console.log(`  NODE_ENV: ${nodeEnv || 'undefined'}`);
-  console.log(`  WEBHOOKS_ENABLED: ${webhooksEnabled || 'undefined'}`);
-  
-  const willWebhooksRun = nodeEnv === 'production' || webhooksEnabled === 'true';
-  
+  console.log(`  NODE_ENV: ${nodeEnv || "undefined"}`);
+  console.log(`  WEBHOOKS_ENABLED: ${webhooksEnabled || "undefined"}`);
+
+  const willWebhooksRun =
+    nodeEnv === "production" || webhooksEnabled === "true";
+
   if (willWebhooksRun) {
     console.log("✅ Webhooks WILL run with current config");
   } else {
     console.log("🔕 Webhooks are DISABLED with current config");
-    console.log("   To enable: set NODE_ENV=production OR WEBHOOKS_ENABLED=true");
+    console.log(
+      "   To enable: set NODE_ENV=production OR WEBHOOKS_ENABLED=true"
+    );
   }
-  
+
   return willWebhooksRun;
 }
 
@@ -196,26 +203,33 @@ function showWebhookInstructions() {
 (async () => {
   try {
     showWebhookInstructions();
-    
+
     const webhooksEnabled = await testWebhookEnvironment();
-    
+
     if (!webhooksEnabled) {
-      console.log("\n⚠️ Running test anyway (webhooks will be logged but not sent)");
+      console.log(
+        "\n⚠️ Running test anyway (webhooks will be logged but not sent)"
+      );
     }
-    
+
     await testWebhookWithWorkingFormat();
-    
+
     console.log("\n🎯 Webhook Integration Test Complete!");
     console.log("📋 Check your application logs for webhook activity");
-    
+
     if (webhooksEnabled) {
       console.log("🔍 Expected webhook calls:");
-      console.log("  1. POST https://www.communityjameel.org/api/mnemo/create-collection-item");
-      console.log("  2. POST https://www.communityjameel.org/api/mnemo/update-collection");
+      console.log(
+        "  1. POST https://www.communityjameel.org/api/mnemo/create-collection-item"
+      );
+      console.log(
+        "  2. POST https://www.communityjameel.org/api/mnemo/update-collection"
+      );
     } else {
-      console.log("🔕 Webhooks were disabled, enable them to see real webhook calls");
+      console.log(
+        "🔕 Webhooks were disabled, enable them to see real webhook calls"
+      );
     }
-    
   } catch (error) {
     console.error("💥 Test suite failed:", error);
   }

@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 interface WebhookPayload {
-  action: 'create' | 'update';
+  action: "create" | "update";
   collectionItem: any;
   metadata?: {
     timestamp: string;
@@ -18,7 +18,7 @@ interface WebhookConfig {
 }
 
 const WEBHOOK_CONFIG: WebhookConfig = {
-  baseUrl: 'https://www.communityjameel.org/api/mnemo',
+  baseUrl: "https://www.communityjameel.org/api/mnemo",
   timeout: 10000, // 10 seconds
   retries: 3,
   enabled: true, // Always enabled - hardcoded
@@ -28,26 +28,28 @@ const WEBHOOK_CONFIG: WebhookConfig = {
  * Send webhook notification to Community Jameel website
  */
 export async function sendWebhook(
-  action: 'create' | 'update',
+  action: "create" | "update",
   collectionItem: any,
   changes?: string[]
 ): Promise<boolean> {
-  
   if (!WEBHOOK_CONFIG.enabled) {
-    console.log(`🔕 Webhooks disabled - would have sent ${action} webhook for: ${collectionItem.slug}`);
+    console.log(
+      `🔕 Webhooks disabled - would have sent ${action} webhook for: ${collectionItem.slug}`
+    );
     return true;
   }
 
-  const endpoint = action === 'create' 
-    ? `${WEBHOOK_CONFIG.baseUrl}/create-collection-item`
-    : `${WEBHOOK_CONFIG.baseUrl}/update-collection`;
+  const endpoint =
+    action === "create"
+      ? `${WEBHOOK_CONFIG.baseUrl}/create-collection-item`
+      : `${WEBHOOK_CONFIG.baseUrl}/update-collection`;
 
   const payload: WebhookPayload = {
     action,
     collectionItem,
     metadata: {
       timestamp: new Date().toISOString(),
-      source: 'mnemosyne-functions',
+      source: "mnemosyne-functions",
       ...(changes && { changes }),
     },
   };
@@ -59,7 +61,7 @@ export async function sendWebhook(
     itemSlug: collectionItem.slug,
     itemType: collectionItem.type,
     itemTitle: collectionItem.title,
-    changes: changes || 'N/A',
+    changes: changes || "N/A",
   });
 
   let lastError: Error | null = null;
@@ -70,8 +72,8 @@ export async function sendWebhook(
       const response = await axios.post(endpoint, payload, {
         timeout: WEBHOOK_CONFIG.timeout,
         headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Mnemosyne-Webhook/1.0',
+          "Content-Type": "application/json",
+          "User-Agent": "Mnemosyne-Webhook/1.0",
           // Add authentication headers if needed
           // 'Authorization': `Bearer ${process.env.WEBHOOK_API_KEY}`,
         },
@@ -85,7 +87,9 @@ export async function sendWebhook(
         });
         return true;
       } else {
-        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        lastError = new Error(
+          `HTTP ${response.status}: ${response.statusText}`
+        );
         console.warn(`⚠️ Webhook ${action} failed (attempt ${attempt}):`, {
           status: response.status,
           itemSlug: collectionItem.slug,
@@ -94,29 +98,35 @@ export async function sendWebhook(
       }
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      console.warn(`⚠️ Webhook ${action} error (attempt ${attempt}/${WEBHOOK_CONFIG.retries}):`, {
-        itemSlug: collectionItem.slug,
-        error: lastError.message,
-      });
+      console.warn(
+        `⚠️ Webhook ${action} error (attempt ${attempt}/${WEBHOOK_CONFIG.retries}):`,
+        {
+          itemSlug: collectionItem.slug,
+          error: lastError.message,
+        }
+      );
 
       // Wait before retry (exponential backoff)
       if (attempt < WEBHOOK_CONFIG.retries) {
         const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
         console.log(`⏳ Retrying webhook in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }
 
   // All retries failed
-  console.error(`❌ Webhook ${action} failed after ${WEBHOOK_CONFIG.retries} attempts:`, {
-    itemSlug: collectionItem.slug,
-    finalError: lastError?.message,
-  });
+  console.error(
+    `❌ Webhook ${action} failed after ${WEBHOOK_CONFIG.retries} attempts:`,
+    {
+      itemSlug: collectionItem.slug,
+      finalError: lastError?.message,
+    }
+  );
 
   // Log to a webhook failure table or service for later retry
   await logWebhookFailure(action, collectionItem, lastError);
-  
+
   return false;
 }
 
@@ -124,7 +134,7 @@ export async function sendWebhook(
  * Log webhook failures for manual retry or debugging
  */
 async function logWebhookFailure(
-  action: 'create' | 'update',
+  action: "create" | "update",
   collectionItem: any,
   error: Error | null
 ): Promise<void> {
@@ -145,7 +155,6 @@ async function logWebhookFailure(
     //   INSERT INTO webhook_failures (action, collection_item_id, error_message, created_at)
     //   VALUES ($1, $2, $3, NOW())
     // `, [action, collectionItem.id, error?.message]);
-
   } catch (logError) {
     console.error(`❌ Failed to log webhook failure:`, logError);
   }
@@ -155,7 +164,7 @@ async function logWebhookFailure(
  * Send webhook with error handling that doesn't block main operation
  */
 export async function sendWebhookSafe(
-  action: 'create' | 'update',
+  action: "create" | "update",
   collectionItem: any,
   changes?: string[]
 ): Promise<void> {
