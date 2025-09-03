@@ -64,6 +64,9 @@ export async function sendWebhook(
     changes: changes || "N/A",
   });
 
+  // 🔍 FULL PAYLOAD LOGGING for debugging
+  console.log(`📦 FULL WEBHOOK PAYLOAD:`, JSON.stringify(payload, null, 2));
+
   let lastError: Error | null = null;
 
   // Retry logic
