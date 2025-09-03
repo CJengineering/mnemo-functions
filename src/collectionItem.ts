@@ -5,6 +5,7 @@ import {
   collectionItemToDbFormat,
   IncomingCollectionItem,
 } from "./mappers";
+import { sendWebhookSafe } from "./services/webhookService";
 
 // CREATE Collection Item
 export async function createCollectionItem(req: Request, res: Response) {
@@ -77,6 +78,10 @@ export async function createCollectionItem(req: Request, res: Response) {
     const collectionItem = result.rows[0];
 
     console.log("✅ Inserted collection item:", collectionItem);
+
+    // ✅ Send CREATE webhook
+    await sendWebhookSafe('create', collectionItem);
+
     res.status(201).json({ success: true, collectionItem });
   } catch (error) {
     console.error("❌ createCollectionItem error:", error);
@@ -179,8 +184,7 @@ export async function updateCollectionItem(req: Request, res: Response) {
     const validTypes = [
       "event",
       "post",
-      "team",
-      "programme",
+      "programme", // ✅ Fixed duplicate "team"
       "news",
       "team",
       "innovation",
@@ -207,6 +211,9 @@ export async function updateCollectionItem(req: Request, res: Response) {
       });
     }
 
+    // ✅ Track what fields are being changed for webhook
+    const changedFields: string[] = [];
+    
     // Build dynamic update query
     const updateFields: string[] = [];
     const params: any[] = [];
@@ -215,31 +222,37 @@ export async function updateCollectionItem(req: Request, res: Response) {
     if (title !== undefined) {
       updateFields.push(`title = $${paramCounter++}`);
       params.push(title);
+      changedFields.push('title');
     }
 
     if (description !== undefined) {
       updateFields.push(`description = $${paramCounter++}`);
       params.push(description);
+      changedFields.push('description');
     }
 
     if (type !== undefined) {
       updateFields.push(`type = $${paramCounter++}`);
       params.push(type);
+      changedFields.push('type');
     }
 
     if (data !== undefined) {
       updateFields.push(`data = $${paramCounter++}`);
       params.push(JSON.stringify(data));
+      changedFields.push('data');
     }
 
     if (metaData !== undefined) {
       updateFields.push(`meta_data = $${paramCounter++}`);
       params.push(JSON.stringify(metaData));
+      changedFields.push('metaData');
     }
 
     if (status !== undefined) {
       updateFields.push(`status = $${paramCounter++}`);
       params.push(status);
+      changedFields.push('status');
     }
 
     if (updateFields.length === 0) {
@@ -264,7 +277,12 @@ export async function updateCollectionItem(req: Request, res: Response) {
         .json({ success: false, error: "Collection item not found" });
     }
 
-    res.json({ success: true, collectionItem: result.rows[0] });
+    const updatedCollectionItem = result.rows[0];
+
+    // ✅ Send UPDATE webhook with changed fields
+    await sendWebhookSafe('update', updatedCollectionItem, changedFields);
+
+    res.json({ success: true, collectionItem: updatedCollectionItem });
   } catch (error) {
     console.error("❌ updateCollectionItem error:", error);
     const errorMessage =
@@ -417,6 +435,10 @@ export async function createCollectionItemFromForm(
     const collectionItem = result.rows[0];
 
     console.log("✅ Created collection item:", collectionItem.id);
+
+    // ✅ Send CREATE webhook
+    await sendWebhookSafe('create', collectionItem);
+
     res.status(201).json({
       success: true,
       collectionItem,
@@ -530,6 +552,9 @@ export async function updateCollectionItemBySlug(req: Request, res: Response) {
 
     console.log(`🔄 Updating collection item with slug: ${slug}`);
 
+    // ✅ Track what fields are being changed for webhook
+    const changedFields: string[] = [];
+
     // Build dynamic update query
     const updates: string[] = [];
     const values: any[] = [];
@@ -538,31 +563,37 @@ export async function updateCollectionItemBySlug(req: Request, res: Response) {
     if (title !== undefined) {
       updates.push(`title = $${paramCount++}`);
       values.push(title);
+      changedFields.push('title');
     }
 
     if (description !== undefined) {
       updates.push(`description = $${paramCount++}`);
       values.push(description);
+      changedFields.push('description');
     }
 
     if (type !== undefined) {
       updates.push(`type = $${paramCount++}`);
       values.push(type);
+      changedFields.push('type');
     }
 
     if (data !== undefined) {
       updates.push(`data = $${paramCount++}`);
       values.push(JSON.stringify(data));
+      changedFields.push('data');
     }
 
     if (metaData !== undefined) {
       updates.push(`meta_data = $${paramCount++}`);
       values.push(JSON.stringify(metaData));
+      changedFields.push('metaData');
     }
 
     if (status !== undefined) {
       updates.push(`status = $${paramCount++}`);
       values.push(status);
+      changedFields.push('status');
     }
 
     // Always update the updated_at timestamp
@@ -591,6 +622,10 @@ export async function updateCollectionItemBySlug(req: Request, res: Response) {
     const updatedItem = result.rows[0];
 
     console.log(`✅ Updated collection item: ${updatedItem.title}`);
+
+    // ✅ Send UPDATE webhook with changed fields
+    await sendWebhookSafe('update', updatedItem, changedFields);
+
     res.json({ success: true, collectionItem: updatedItem });
   } catch (error) {
     console.error("❌ updateCollectionItemBySlug error:", error);
