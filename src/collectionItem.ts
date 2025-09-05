@@ -169,7 +169,7 @@ export async function getCollectionItemById(req: Request, res: Response) {
 export async function updateCollectionItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const { title, description, type, data, metaData, status } = req.body;
+    const { title, description, type, data, metaData, status, slug } = req.body;
 
     // Validate UUID format (collection items use UUIDs, not numeric IDs)
     const uuidRegex =
@@ -223,6 +223,12 @@ export async function updateCollectionItem(req: Request, res: Response) {
       updateFields.push(`title = $${paramCounter++}`);
       params.push(title);
       changedFields.push("title");
+    }
+
+    if (slug !== undefined) {
+      updateFields.push(`slug = $${paramCounter++}`);
+      params.push(slug);
+      changedFields.push("slug");
     }
 
     if (description !== undefined) {
@@ -497,7 +503,7 @@ export async function getCollectionItemBySlug(req: Request, res: Response) {
 export async function updateCollectionItemBySlug(req: Request, res: Response) {
   try {
     const { slug } = req.params;
-    const { title, description, type, data, metaData, status } = req.body;
+    const { title, description, type, data, metaData, status, slug: newSlug } = req.body;
 
     if (!slug) {
       return res.status(400).json({
@@ -564,6 +570,12 @@ export async function updateCollectionItemBySlug(req: Request, res: Response) {
       updates.push(`title = $${paramCount++}`);
       values.push(title);
       changedFields.push("title");
+    }
+
+    if (newSlug !== undefined) {
+      updates.push(`slug = $${paramCount++}`);
+      values.push(newSlug);
+      changedFields.push("slug");
     }
 
     if (description !== undefined) {
