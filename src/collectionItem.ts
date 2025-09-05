@@ -503,7 +503,15 @@ export async function getCollectionItemBySlug(req: Request, res: Response) {
 export async function updateCollectionItemBySlug(req: Request, res: Response) {
   try {
     const { slug } = req.params;
-    const { title, description, type, data, metaData, status, slug: newSlug } = req.body;
+    const {
+      title,
+      description,
+      type,
+      data,
+      metaData,
+      status,
+      slug: newSlug,
+    } = req.body;
 
     if (!slug) {
       return res.status(400).json({
