@@ -313,21 +313,43 @@ export async function deleteCollectionItem(req: Request, res: Response) {
         .json({ success: false, error: "Invalid ID format" });
     }
 
-    const result = await pool.query(
-      "DELETE FROM collection_item WHERE id = $1 RETURNING *",
+    // First get the item data before deleting (for webhook)
+    const getResult = await pool.query(
+      "SELECT * FROM collection_item WHERE id = $1",
       [id]
     );
 
-    if (result.rows.length === 0) {
+    if (getResult.rows.length === 0) {
       console.log(`⚠️ Collection item with ID ${id} not found for deletion`);
       return res
         .status(404)
         .json({ success: false, error: "Collection item not found" });
     }
 
+    const deletedCollectionItem = getResult.rows[0];
+
+    // Now delete the item
+    const result = await pool.query(
+      "DELETE FROM collection_item WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    console.log(
+      `✅ Deleted collection item: ${deletedCollectionItem.title} (${deletedCollectionItem.slug})`
+    );
+
+    // ✅ Send DELETE webhook
+    await sendWebhookSafe("delete", deletedCollectionItem);
+
     res.json({
       success: true,
       message: "Collection item deleted successfully",
+      deletedItem: {
+        id: deletedCollectionItem.id,
+        title: deletedCollectionItem.title,
+        slug: deletedCollectionItem.slug,
+        type: deletedCollectionItem.type,
+      },
     });
   } catch (error) {
     console.error("❌ deleteCollectionItem error:", error);

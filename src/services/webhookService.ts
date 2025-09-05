@@ -1,7 +1,7 @@
 import axios from "axios";
 
 interface WebhookPayload {
-  action: "create" | "update";
+  action: "create" | "update" | "delete";
   collectionItem: any;
   metadata?: {
     timestamp: string;
@@ -28,7 +28,7 @@ const WEBHOOK_CONFIG: WebhookConfig = {
  * Send webhook notification to Community Jameel website
  */
 export async function sendWebhook(
-  action: "create" | "update",
+  action: "create" | "update" | "delete",
   collectionItem: any,
   changes?: string[]
 ): Promise<boolean> {
@@ -42,7 +42,9 @@ export async function sendWebhook(
   const endpoint =
     action === "create"
       ? `${WEBHOOK_CONFIG.baseUrl}/create-collection-item`
-      : `${WEBHOOK_CONFIG.baseUrl}/update-collection`;
+      : action === "update"
+      ? `${WEBHOOK_CONFIG.baseUrl}/update-collection`
+      : `${WEBHOOK_CONFIG.baseUrl}/delete-collection-item`;
 
   const payload: WebhookPayload = {
     action,
@@ -132,7 +134,7 @@ export async function sendWebhook(
  * Log webhook failures for manual retry or debugging
  */
 async function logWebhookFailure(
-  action: "create" | "update",
+  action: "create" | "update" | "delete",
   collectionItem: any,
   error: Error | null
 ): Promise<void> {
@@ -162,7 +164,7 @@ async function logWebhookFailure(
  * Send webhook with error handling that doesn't block main operation
  */
 export async function sendWebhookSafe(
-  action: "create" | "update",
+  action: "create" | "update" | "delete",
   collectionItem: any,
   changes?: string[]
 ): Promise<void> {
